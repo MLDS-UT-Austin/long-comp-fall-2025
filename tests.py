@@ -10,6 +10,8 @@ from nlp import *
 from submission import *
 from util import *
 
+# This file is for internal use only to test the code ####################################
+
 
 class TestGame(unittest.IsolatedAsyncioTestCase):
 

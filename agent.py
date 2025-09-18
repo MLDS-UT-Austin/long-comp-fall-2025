@@ -6,6 +6,8 @@ from data import Location, redaction_dict
 from nlp import LLMRole, NLPProxy
 from util import redact, relative_path_decorator
 
+# This file explains what each method in the Agent class should do ######################
+
 AGENT_REGISTRY = {}
 
 
@@ -122,13 +124,24 @@ class Agent(ABC):
         event_loop = asyncio.get_event_loop()
         nlp = NLPProxy()
         for _ in range(100):
-            for loc, n_players in [(Location.AIRPLANE, 3), (None, 3), (Location.BEACH, 10), (None, 10)]:
+            for loc, n_players in [
+                (Location.AIRPLANE, 3),
+                (None, 3),
+                (Location.BEACH, 10),
+                (None, 10),
+            ]:
                 agent = cls(loc, n_players, 5, nlp)
                 answerer, question = event_loop.run_until_complete(agent.ask_question())
-                answer0 = event_loop.run_until_complete(agent.answer_question("question here"))
+                answer0 = event_loop.run_until_complete(
+                    agent.answer_question("question here")
+                )
                 answer1 = event_loop.run_until_complete(agent.answer_question(""))
-                event_loop.run_until_complete(agent.analyze_response(1, "question here", 2, "answer here"))
-                event_loop.run_until_complete(agent.analyze_response(0, "question here", 2, "answer here"))
+                event_loop.run_until_complete(
+                    agent.analyze_response(1, "question here", 2, "answer here")
+                )
+                event_loop.run_until_complete(
+                    agent.analyze_response(0, "question here", 2, "answer here")
+                )
                 event_loop.run_until_complete(agent.analyze_response(2, "", 0, ""))
                 guess = event_loop.run_until_complete(agent.guess_location())
                 accusation = event_loop.run_until_complete(agent.accuse_player())

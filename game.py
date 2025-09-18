@@ -15,6 +15,9 @@ from nlp import *
 from util import *
 from visualizations import Visualization
 
+# This file is for internal use to run the game ####################################
+# Use main.py instead ##############################################################
+
 
 # Used to describe how the game ended or if it is ongoing
 class GameState(Enum):
@@ -205,7 +208,7 @@ class Game:
         # set column order to player, player_name, message
         df = df[["player", "player_name", "message"]]
         return df
-    
+
     def save_conversation(self, path: str):
         """Saves the conversation to a path
         Converts to 1-indexed player ids"""
@@ -238,7 +241,7 @@ class Game:
 
         for round in self.rounds:
             round.render(vis)
-            
+
         # close pygame
         del vis
 
@@ -289,7 +292,9 @@ class Round:
 
         # if the questioner selected the last questioner, select a random player
         if game.last_questioner != -1 and answerer == game.last_questioner:
-            print(f"questioner ({type(game.players[questioner])}) selected last questioner, selecting random player")
+            print(
+                f"questioner ({type(game.players[questioner])}) selected last questioner, selecting random player"
+            )
             answerer = random.choice(
                 [
                     i

@@ -1,6 +1,6 @@
 from agent import Agent, register_agent
 from data import Location, redaction_dict
-from nlp import NLPProxy, LLMRole
+from nlp import LLMRole, NLPProxy
 from util import redact
 
 """

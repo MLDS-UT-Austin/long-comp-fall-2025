@@ -1,6 +1,9 @@
 import pygame
 from pygame.locals import *
 
+# This file is for internal use to render games ####################################
+
+
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 

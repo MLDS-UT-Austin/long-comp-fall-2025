@@ -9,7 +9,10 @@ from tqdm import tqdm
 
 dotenv.load_dotenv()
 
-WHITE_LIST = ["justinsasek", "github-classroom[bot]"]  # Ignore commits by these authors when filtering repos
+WHITE_LIST = [
+    "justinsasek",
+    "github-classroom[bot]",
+]  # Ignore commits by these authors when filtering repos
 CLASSROOM_ORG = "MLDS-UT-AUSTIN"  # Replace with your org name
 ASSIGNMENT_PREFIX = "longcomp2025-"  # Replace with your assignment prefix
 OUTPUT_DIR = "submissions"  # Directory to store cloned repos

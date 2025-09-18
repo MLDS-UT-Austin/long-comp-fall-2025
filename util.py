@@ -20,6 +20,8 @@ from together.error import RateLimitError
 
 from data import *
 
+# Feel free to use redact() in your agent:
+
 
 def redact(text: str, location: Location, redacted_text: str = "<REDACTED>") -> str:
     """Can optionally by used by agents to redact text based on the location
@@ -33,6 +35,9 @@ def redact(text: str, location: Location, redacted_text: str = "<REDACTED>") -> 
     for word in redaction_dict[location]:
         text = re.sub(rf"{word}", redacted_text, text, flags=re.IGNORECASE)
     return text
+
+
+# Everything below is for internal use ###############################################
 
 
 def count_votes(votes: list[int | None], n_players: int) -> int | None:
@@ -146,6 +151,7 @@ def relative_path_decorator(cls):
     # Wrap all methods
     for attr_name, attr_value in cls.__dict__.items():
         if callable(attr_value):
+
             @functools.wraps(attr_value)
             def wrapped_method(*args, original_method=attr_value, **kwargs):
                 original_dir = os.getcwd()
@@ -266,6 +272,7 @@ def text_to_speech(
 
     return x, sr
 
+
 def get_voice_and_ps(player_name: str) -> tuple[tuple[str, str], float]:
     """Get the voice and pitch shift for a player based on their name
 
@@ -278,13 +285,13 @@ def get_voice_and_ps(player_name: str) -> tuple[tuple[str, str], float]:
     voice = VOICES[hash(player_name) % len(VOICES)]
     pitch_shift = PITCH_SHIFTS[hash(player_name) % len(PITCH_SHIFTS)]
     return voice, pitch_shift
-    
 
 
 if __name__ == "__main__":
     sample_agents(["a", "b", "c", "d", "e", "f"], 4, 100, True)
 
     import pygame
+
     os.environ["SDL_AUDIODRIVER"] = "coreaudio"
 
     for ps in PITCH_SHIFTS:
