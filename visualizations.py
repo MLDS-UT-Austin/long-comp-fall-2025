@@ -15,9 +15,9 @@ PLAYER_IMG = pygame.transform.scale(PLAYER_IMG, (100, 100))
 
 
 class Visualization:
-    def __init__(self, player_names: list[str], spy_index: int, location: str):
+    def __init__(self, player_names: list[str], spy_indices: list[int], location: str):
         self.player_names = player_names
-        self.spy_index = spy_index
+        self.spy_indices = spy_indices
         self.location = location
 
         # Initialize pygame
@@ -41,7 +41,7 @@ class Visualization:
 
         # Display spy and player images on self.screen
         for i in range(4):
-            img = SPY_IMG if i == self.spy_index else PLAYER_IMG
+            img = SPY_IMG if i in self.spy_indices else PLAYER_IMG
             self.screen.blit(img, self._player_pos(i) + pygame.Vector2(-50, -50))
 
         # Display player labels

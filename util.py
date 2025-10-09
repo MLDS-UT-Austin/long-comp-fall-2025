@@ -62,6 +62,7 @@ def sample_agents(
     agent_names: list[str],
     team_size: int,
     n_games: int,
+    n_spies: int = 1,
     verbose: bool = False,
     max_same_agent: int = 2,
 ) -> list[tuple[list[str], int]]:
@@ -104,16 +105,15 @@ def sample_agents(
                 agent_count[agent] += 1
 
         # Randomly assign one agent as the spy, ensuring fairness
-        spy_id, spy_name = random.choices(
-            list(enumerate(game_agents)),
-            weights=[
-                1 / (spy_count[agent] - spy_count_bias + 1) for agent in game_agents
-            ],
-        )[0]
-        spy_count[spy_name] += 1
+        spy_ids = random.sample(range(team_size), n_spies)
+        spy_names = [game_agents[i] for i in spy_ids]
+
+        for spy_name in spy_names:
+            spy_count[spy_name] += 1
+        
         game_agents_count["".join(sorted(game_agents))] += 1
 
-        output.append((game_agents, spy_id))
+        output.append((game_agents, spy_ids))
 
     if verbose:
         print(agent_count)
