@@ -12,3 +12,4 @@ together
 torch
 tqdm
 transformers
+google-cloud-aiplatform
