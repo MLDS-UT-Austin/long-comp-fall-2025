@@ -20,17 +20,6 @@ from together.error import RateLimitError
 
 from data import *
 
-from vertexai.preview.generative_models import GenerativeModel
-import vertexai
-
-def get_ai_generated_clue():
-    vertexai.init(project="gcp-project-id", location="us-central1")
-    model = GenerativeModel("gemini-1.5-flash")
-    prompt = "prompt here"
-    response = model.generate_content(prompt)
-    return response.text
-
-
 def redact(text: str, location: Location, redacted_text: str = "<REDACTED>") -> str:
     """Can optionally by used by agents to redact text based on the location
     This can be useful to prevent the LLM from giving away the location

@@ -15,6 +15,10 @@ from transformers import (  # type: ignore
     AutoTokenizer,
 )
 
+from vertexai.preview.language_models import TextGenerationModel
+from vertexai.language_models import TextEmbeddingModel
+import vertexai
+
 from util import rate_limit
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -45,7 +49,6 @@ class LLMTokenizer(ABC):
     def count_tokens(self, text_or_prompt: str | list[tuple[LLMRole, str]]) -> int:
         pass
 
-
 class LLM(ABC):
     @abstractmethod
     async def prompt(
@@ -74,54 +77,44 @@ class Embedding(ABC):
 # Implementations ####################################################################
 
 
-class LlamaTokenizer(LLMTokenizer):
-    def __init__(self):
-        # Use NousResearch bc it doesn't have retricted access
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            "NousResearch/Meta-Llama-3-70B-Instruct"
-        )
+class GeminiTokenizer(LLMTokenizer):    
+    def __init__(self, project_id: str, location: str):
+        vertexai.init(project=project_id, location=location)
+        self.model = TextGenerationModel.from_pretrained("gemini-1.5-flash")
 
-    def count_tokens(self, text_or_prompt: str | list[tuple[LLMRole, str]]) -> int:
-        if isinstance(text_or_prompt, str):
-            tokens = self.tokenizer(text_or_prompt).encodings[0].tokens
-            return len(tokens)
+    def count_tokens(self, text_or_prompt: str | list[tuple[str, str]]) -> int:
+        if isinstance(text_or_prompt, list):
+            text = "\n".join([f"{role}: {content}" for role, content in text_or_prompt])
         else:
-            tokens = [
-                self.tokenizer(content).encodings[0].tokens
-                for role, content in text_or_prompt
-            ]
-            return sum(len(token) for token in tokens)
+            text = text_or_prompt
+        
+        token_info = self.model.count_tokens(text)
+        return token_info.total_tokens
 
-
-class Llama(LLM):
-    def __init__(self):
+class GeminiLLM(LLM):
+    def __init__(self, project_id: str, location: str, model_name: str = "gemini-2.5-flash"):
         super().__init__()
-        if isinstance(client, Exception):
-            raise client
+        vertexai.init(project=project_id, location=location)
+        self.model = TextGenerationModel.from_pretrained(model_name)
 
-    @rate_limit(requests_per_second=1)
     async def prompt(
         self,
-        prompt: list[tuple[LLMRole, str]],
+        prompt: list[tuple[str, str]],
         max_output_tokens: int | None = None,
         temperature: float = 0.7,
     ) -> str:
-        messages = [
-            {"role": role.value, "content": content} for role, content in prompt
-        ]
-        response = await client.chat.completions.create(
-            model="meta-llama/Meta-Llama-3-70B-Instruct-Lite",
-            messages=messages,
-            max_tokens=max_output_tokens,
-            temperature=temperature,
-            top_p=0.7,
-            top_k=50,
-            repetition_penalty=1,
-            stop=["<|eot_id|>"],
-            stream=False,
+        # Flatten role/content into a single string
+        text = "\n".join([f"{role}: {content}" for role, content in prompt])
+        
+        # Generate text
+        response = self.model.generate_content(
+            text,
+            generation_config={
+                "temperature": temperature,
+                "max_output_tokens": max_output_tokens,
+            }
         )
-        return response.choices[0].message.content
-
+        return response.text
 
 class DummyLLM(LLM):
     """A dummy LLM for testing"""
@@ -135,40 +128,42 @@ class DummyLLM(LLM):
         return "Output from the LLM will be here"
 
 
-class BERTTokenizer(EmbeddingTokenizer):
-    def __init__(self):
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            "bert-base-uncased", clean_up_tokenization_spaces=True
-        )
+class GeminiEmbeddingTokenizer(EmbeddingTokenizer):
+    #set location to "us-central1"
+    def __init__(self, project_id, location):
+        vertexai.init(project=project_id, location=location)
+        self.model = TextEmbeddingModel.from_pretrained("gemini-embedding-001")
 
     def count_tokens(self, text: str | list[str]) -> int:
-        text = [text] if isinstance(text, str) else text
-        token_list = [self.tokenizer(t).encodings[0].tokens for t in text]
-        return sum(len(tokens) for tokens in token_list)
+        texts = [text] if isinstance(text, str) else text
+        total = 0
+        for t in texts:
+            token_info = self.model.count_tokens(t)
+            total += token_info.total_tokens
+        return total
 
 
-class BERTTogether(Embedding):
-    def __init__(self):
+class GeminiEmbedding(Embedding):
+    def __init__(self, project_id: str, location: str):
         super().__init__()
-        if isinstance(client, Exception):
-            raise client
+        vertexai.init(project=project_id, location=location)
+        self.model = TextEmbeddingModel.from_pretrained("gemini-embedding-001")
+        #google vertex embedding model
 
     @rate_limit(requests_per_second=50)
     async def get_embeddings(
         self, text: str | list[str]
     ) -> np.ndarray | list[np.ndarray]:
-        """returns a 768-dimensional embedding"""
-        response = await client.embeddings.create(
-            model="togethercomputer/m2-bert-80M-2k-retrieval",
-            input=text,
-        )
-        embeddings = [
-            np.array(response.data[i].embedding) for i in range(len(response.data))
-        ]
+        """Returns embeddings using Vertex AI's textembedding-gecko model."""
+        texts = [text] if isinstance(text, str) else text
+
+        # Vertex API call (synchronous by default, so run in async context safely)
+        embeddings_response = self.model.get_embeddings(texts)
+        embeddings = [np.array(e.values) for e in embeddings_response]
+
         if isinstance(text, str):
             return embeddings[0]
         return embeddings
-
 
 class BERTLocal(Embedding):
     def __init__(
