@@ -21,6 +21,87 @@ import vertexai
 
 from util import rate_limit
 
+# This file explains how LLMRole and NLPProxy work, which are used by your agent to interact with the LLM #################
+
+
+class LLMRole(Enum):
+    SYSTEM = "system"
+    USER = "user"
+    ASSISTANT = "assistant"
+
+
+class NLPProxy:
+    """The wrapper that agents will use to interact with the LLM"""
+
+    def __init__(self, token_counter=None):
+        if token_counter is None:
+            token_counter = TokenCounterWrapper()
+        self.__token_counter = token_counter
+
+    async def prompt_llm(
+        self,
+        prompt: list[tuple[LLMRole, str]],
+        max_output_tokens: int | None = None,
+        temperature: float = 0.7,
+    ) -> str:
+        """prompts the LLM with a given prompt and returns the output
+
+        Args:
+            prompt (list[tuple[LLMRole, str]]): List of tuples containing the role and text.
+                Use LLMRole.SYSTEM to give the llm background information and LLMRole.USER for user input.
+                LLMRole.ASSISTANT can be used to give the llm an example of how to respond.
+
+            max_output_tokens (int | None, optional): The maximum number of tokens to output or None for no limit
+
+            temperature (float, optional): The temperature to use for the llm. A higher temperature produces more varied results. Defaults to 0.7.
+
+        Returns:
+            str: llm output
+        """
+        return await self.__token_counter.prompt_llm(
+            prompt, max_output_tokens, temperature
+        )
+
+    async def get_embeddings(
+        self, text: str | list[str]
+    ) -> np.ndarray | list[np.ndarray]:
+        """Gets a 768-dimensional embedding for the given text
+
+        Args:
+            text (str): Input text. This will counted against the token limit but at a lesser extent than the llm.
+                Every 10 tokens inputted into the embedding model is equivalent to 1 token inputted into the llm.
+
+        Returns:
+            np.ndarray: 768-dimensional embedding
+        """
+        return await self.__token_counter.get_embeddings(text)
+
+    def count_llm_tokens(self, text_or_prompt: str | list[tuple[LLMRole, str]]) -> int:
+        """Used to count the number of tokens that would be used by the llm. This can help agents manage their token usage.
+
+        Args:
+            text_or_prompt (str | list[tuple[LLMRole, str]]): Input text as a string or a list of tuples containing the role and text
+
+        Returns:
+            int: Number of tokens
+        """
+        return self.__token_counter.count_llm_tokens(text_or_prompt)
+
+    def count_embedding_tokens(self, text: str | list[str]) -> int:
+        """Equivalent to count_llm_tokens but for the embedding model"""
+        return self.__token_counter.count_embedding_tokens(text)
+
+    def get_remaining_tokens(self) -> int:
+        """
+        Returns:
+            int: the number of tokens remaining for your agent for the round
+        """
+        return self.__token_counter.remaining_tokens
+
+
+# Everything below is for internal use only ####################################################################
+
+
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # Please set your API key in the .env file: "TOGETHER_API_KEY=<your-api-key>"
@@ -204,6 +285,7 @@ class NLP:
     def __getstate__(self):
         return {}
 
+
 @dataclass
 class TokenCounterWrapper:
     """Used for NLP instances that need to keep track of token usage"""
@@ -257,75 +339,6 @@ class TokenCounterWrapper:
 
     def count_embedding_tokens(self, text: str | list[str]) -> int:
         return self.nlp.count_embedding_tokens(text)
-
-
-class NLPProxy:
-    """The wrapper that agents will use to interact with the LLM"""
-
-    def __init__(self, token_counter: TokenCounterWrapper | None = None):
-        if token_counter is None:
-            token_counter = TokenCounterWrapper()
-        self.__token_counter = token_counter
-
-    async def prompt_llm(
-        self,
-        prompt: list[tuple[LLMRole, str]],
-        max_output_tokens: int | None = None,
-        temperature: float = 0.7,
-    ) -> str:
-        """prompts the LLM with a given prompt and returns the output
-
-        Args:
-            prompt (list[tuple[LLMRole, str]]): List of tuples containing the role and text.
-                Use LLMRole.SYSTEM to give the llm background information and LLMRole.USER for user input.
-                LLMRole.ASSISTANT can be used to give the llm an example of how to respond.
-
-            max_output_tokens (int | None, optional): The maximum number of tokens to output or None for no limit
-
-            temperature (float, optional): The temperature to use for the llm. A higher temperature produces more varied results. Defaults to 0.7.
-
-        Returns:
-            str: llm output
-        """
-        return await self.__token_counter.prompt_llm(
-            prompt, max_output_tokens, temperature
-        )
-
-    async def get_embeddings(
-        self, text: str | list[str]
-    ) -> np.ndarray | list[np.ndarray]:
-        """Gets a 768-dimensional embedding for the given text
-
-        Args:
-            text (str): Input text. This will counted against the token limit but at a lesser extent than the llm.
-                Every 10 tokens inputted into the embedding model is equivalent to 1 token inputted into the llm.
-
-        Returns:
-            np.ndarray: 768-dimensional embedding
-        """
-        return await self.__token_counter.get_embeddings(text)
-
-    def count_llm_tokens(self, text_or_prompt: str | list[tuple[LLMRole, str]]) -> int:
-        """Used to count the number of tokens that would be used by the llm. This can help agents manage their token usage.
-
-        Args:
-            text_or_prompt (str | list[tuple[LLMRole, str]]): Input text as a string or a list of tuples containing the role and text
-
-        Returns:
-            int: Number of tokens
-        """
-        return self.__token_counter.count_llm_tokens(text_or_prompt)
-
-    def count_embedding_tokens(self, text: str | list[str]) -> int:
-        """Equivalent to count_llm_tokens but for the embedding model"""
-        return self.__token_counter.count_embedding_tokens(text)
-
-    def get_remaining_tokens(self) -> int:
-        """
-        Returns:
-            int: the number of tokens remaining for your agent for the round
-        """
-        return self.__token_counter.remaining_tokens
 
 
 if __name__ == "__main__":

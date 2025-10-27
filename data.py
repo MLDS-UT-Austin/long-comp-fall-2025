@@ -1,5 +1,7 @@
 from enum import Enum
 
+# This file contains useful data for agents to use ###############################
+
 
 # All possible locations in the game
 class Location(Enum):
@@ -65,7 +67,7 @@ redaction_dict = {
 }
 # fmt: on
 
-# Below are used in game.py to render games ####################################
+# Everthing below is for internal use to generate the game dialogue #####################################
 
 SPY_REVEAL_AND_GUESS = (
     "Muah ha ha! I was the spy all along! Was it the {location}?",

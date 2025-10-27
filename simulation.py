@@ -16,6 +16,9 @@ from game import *
 from nlp import *
 from util import *
 
+# This file is for internal use to run simulations ####################################
+# Use main.py instead #################################################################
+
 
 @dataclass
 class Simulation:

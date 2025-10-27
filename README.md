@@ -45,7 +45,7 @@ This is the repository for the 2025 UT Austin MLDS Long Competition where teams 
 To run this project locally with conda, run the following commands. This may take a while.
 
 ``` bash
-conda create -n long_comp python==3.10.13
+conda create -n long_comp python==3.10.13 -y
 conda activate long_comp
 pip install -r requirements.txt
 ```
