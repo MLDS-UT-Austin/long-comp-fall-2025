@@ -24,6 +24,7 @@ from util import rate_limit
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # Please set your API key in the .env file: "TOGETHER_API_KEY=<your-api-key>"
+"""
 load_dotenv()
 
 if "TOGETHER_API_KEY" in os.environ:
@@ -34,7 +35,7 @@ if "TOGETHER_API_KEY" in os.environ:
 else:
     client = Exception("Please set your API key in the .env file")
 
-
+"""
 class LLMRole(Enum):
     SYSTEM = "system"
     USER = "user"
@@ -75,7 +76,6 @@ class Embedding(ABC):
 
 
 # Implementations ####################################################################
-
 
 class GeminiTokenizer(LLMTokenizer):    
     def __init__(self, project_id: str, location: str):
@@ -142,13 +142,12 @@ class GeminiEmbeddingTokenizer(EmbeddingTokenizer):
             total += token_info.total_tokens
         return total
 
-
 class GeminiEmbedding(Embedding):
     def __init__(self, project_id: str, location: str):
         super().__init__()
         vertexai.init(project=project_id, location=location)
         self.model = TextEmbeddingModel.from_pretrained("gemini-embedding-001")
-        #google vertex embedding model
+        #google vertex AI, gemini embedding model
 
     @rate_limit(requests_per_second=50)
     async def get_embeddings(
@@ -165,74 +164,6 @@ class GeminiEmbedding(Embedding):
             return embeddings[0]
         return embeddings
 
-class BERTLocal(Embedding):
-    def __init__(
-        self,
-        device: str = "cpu",
-        batch_size: int = 8,
-    ):
-        self.device = device
-        self.batch_size = batch_size
-
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            "bert-base-uncased",
-            clean_up_tokenization_spaces=True,
-        )
-        self.model = AutoModelForSequenceClassification.from_pretrained(
-            "togethercomputer/m2-bert-80M-2k-retrieval", trust_remote_code=True
-        ).to(device)
-        self.model.eval()
-
-    async def model_loop(self):
-        """Use a loop to optimize with batching"""
-        while True:
-            # Once an item is added to the queue, build as large of a batch as possible (up to batch_size) and process it
-            dequeued = [await self.queue.get()]
-            for _ in range(self.batch_size - 1):
-                try:
-                    dequeued.append(self.queue.get_nowait())
-                except asyncio.QueueEmpty:
-                    break
-
-            # print("batch size", len(dequeued))
-            inputs, futures = zip(*dequeued)
-
-            # tokenize and pad to the longest sequence in the batch
-            input_ids = self.tokenizer(
-                inputs,
-                return_tensors="pt",
-                padding="longest",
-                return_token_type_ids=False,
-            ).to(self.device)
-
-            # run model
-            with torch.no_grad():
-                outputs = self.model(**input_ids)
-
-            embeddings = outputs["sentence_embedding"].detach().cpu().numpy()
-            for future, embedding in zip(futures, embeddings):
-                future.set_result(embedding)
-
-    async def get_embeddings(
-        self, text: str | list[str]
-    ) -> np.ndarray | list[np.ndarray]:
-        """This adds the text to the queue which will be processed in the model_loop
-        the model_loop will then set the future with the embedding"""
-        if not hasattr(self, "model_loop_task") or self.model_loop_task.cancelled():  # type: ignore
-            self.queue: asyncio.Queue[tuple[str, asyncio.Future]] = asyncio.Queue()
-            self.model_loop_task = asyncio.create_task(self.model_loop())
-        text_list = [text] if isinstance(text, str) else text
-        futures = []
-        for t in text_list:
-            future = asyncio.get_event_loop().create_future()
-            self.queue.put_nowait((t, future))
-            futures.append(future)
-        embeddings = await asyncio.gather(*futures)
-        if isinstance(text, str):
-            return embeddings[0]
-        return embeddings
-
-
 class DummyEmbedding(Embedding):
     async def get_embeddings(
         self, text: str | list[str]
@@ -240,7 +171,6 @@ class DummyEmbedding(Embedding):
         if isinstance(text, str):
             return np.zeros(768)
         return [np.zeros(768) for _ in text]
-
 
 @dataclass
 class NLP:
