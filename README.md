@@ -35,6 +35,7 @@ This is the repository for the 2025 UT Austin MLDS Long Competition where teams 
 
 **<u>Scoring</u>**:
 
+# TODO fixme: scoring details
 * **<u>Spy Victory</u>**: The spy earns 2 points if no one is indicted of being the spy, 4 points if a non-spy player is indicted of being the spy, and 4 points if the spy stops the game and successfully guesses the location.
 * **<u>Non-Spy Victory</u>**: Each non-spy player earns 1 point.
 

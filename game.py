@@ -22,9 +22,12 @@ from visualizations import Visualization
 # Used to describe how the game ended or if it is ongoing
 class GameState(Enum):
     RUNNING = "running"
-    SPY_GUESSED_RIGHT = "spy guessed right"
-    SPY_GUESSED_WRONG = "spy guessed wrong"
-    SPY_INDICTED = "spy indicted"
+    SPY1_GUESSED_RIGHT = "spy1 guessed right"
+    SPY2_GUESSED_RIGHT = "spy2 guessed right"
+    SPY1_GUESSED_WRONG = "spy1 guessed wrong"
+    SPY2_GUESSED_WRONG = "spy2 guessed wrong"
+    SPY1_INDICTED = "spy1 indicted"
+    SPY2_INDICTED = "spy2 indicted"
     NON_SPY_INDICTED = "non-spy indicted"
     NO_ONE_INDICTED = "no one indicted"
 
@@ -39,30 +42,49 @@ class Game:
     n_rounds: int
 
     location: Location
-    spy: int
+    spies: list[int]  # list of spy player indices
     questioner: int  # current questioner
     last_questioner: int = -1  # last questioner
     players: list[Agent]
     player_nlps: list[TokenCounterWrapper]  # each keeps track of tokens per round
     rounds: list["Round"]
     game_state: GameState
+    indicted_spy: int | None = None  # which spy was indicted (if any)
+    guessing_spy: int | None = None  # which spy made the guess (if any)
 
     # can be optionally set to visualize how many rounds have been played
     tqdm_bar: tqdm | None = None
 
-    spy_scoring = {
+    spy1_scoring = {
         GameState.RUNNING: 0,
-        GameState.SPY_GUESSED_RIGHT: 4,
-        GameState.SPY_GUESSED_WRONG: 0,
-        GameState.SPY_INDICTED: 0,
-        GameState.NON_SPY_INDICTED: 4,
+        GameState.SPY1_GUESSED_RIGHT: 4,
+        GameState.SPY2_GUESSED_RIGHT: 0,
+        GameState.SPY1_GUESSED_WRONG: 0,
+        GameState.SPY2_GUESSED_WRONG: 1,
+        GameState.SPY1_INDICTED: 0,
+        GameState.SPY2_INDICTED: 4,
+        GameState.NON_SPY_INDICTED: 3,
+        GameState.NO_ONE_INDICTED: 2,
+    }
+    spy2_scoring = {
+        GameState.RUNNING: 0,
+        GameState.SPY1_GUESSED_RIGHT: 0,
+        GameState.SPY2_GUESSED_RIGHT: 4,
+        GameState.SPY1_GUESSED_WRONG: 1,
+        GameState.SPY2_GUESSED_WRONG: 0,
+        GameState.SPY1_INDICTED: 4,
+        GameState.SPY2_INDICTED: 0,
+        GameState.NON_SPY_INDICTED: 3,
         GameState.NO_ONE_INDICTED: 2,
     }
     nonspy_scoring = {
         GameState.RUNNING: 0,
-        GameState.SPY_GUESSED_RIGHT: 0,
-        GameState.SPY_GUESSED_WRONG: 1,
-        GameState.SPY_INDICTED: 1,
+        GameState.SPY1_GUESSED_RIGHT: 0,
+        GameState.SPY2_GUESSED_RIGHT: 0,
+        GameState.SPY1_GUESSED_WRONG: 1,
+        GameState.SPY2_GUESSED_WRONG: 1,
+        GameState.SPY1_INDICTED: 1,
+        GameState.SPY2_INDICTED: 1,
         GameState.NON_SPY_INDICTED: 0,
         GameState.NO_ONE_INDICTED: 0,
     }
@@ -72,7 +94,7 @@ class Game:
         nlp: NLP,
         player_names: list[str] | None = None,
         n_rounds: int = 20,
-        spy_id: int | None = None,
+        spy_ids: list[int] | None = None,
     ):
         # init game
         if player_names is None:
@@ -83,10 +105,11 @@ class Game:
         self.n_rounds = n_rounds
 
         self.location = random.choice(list(Location))
-        if spy_id is not None:
-            self.spy = spy_id
+        if spy_ids is not None:
+            self.spies = spy_ids
         else:
-            self.spy = random.randint(0, n_players - 1)
+            # Randomly assign 2 players as spies
+            self.spies = random.sample(range(n_players), 2)
         self.questioner = random.randint(0, n_players - 1)
         self.players = []
         self.player_nlps = []
@@ -96,7 +119,7 @@ class Game:
         for i, player_class_name in enumerate(player_names):
             player_class = AGENT_REGISTRY[player_class_name]
             player_nlp = TokenCounterWrapper(nlp)
-            given_location = self.location if i != self.spy else None
+            given_location = self.location if i not in self.spies else None
             player_instance = player_class(
                 given_location, n_players, n_rounds, nlp=NLPProxy(player_nlp)
             )
@@ -154,7 +177,8 @@ class Game:
                 values: score
         """
         scores_list = [self.nonspy_scoring[self.game_state]] * self.n_players
-        scores_list[self.spy] = self.spy_scoring[self.game_state]
+        scores_list[self.spies[0]] = self.spy1_scoring[self.game_state]
+        scores_list[self.spies[1]] = self.spy2_scoring[self.game_state]
 
         scores = pd.Series(data=scores_list, index=self.player_names)
         scores = scores.groupby(scores.index).mean()
@@ -179,8 +203,15 @@ class Game:
         if len(votes) == 0:
             return pd.Series(index=list(set(self.player_names)))
 
-        percent_right_votes = np.mean(votes == self.spy, axis=0)
-        percent_right_votes[self.spy] = np.nan
+        # Calculate percent right votes for each spy
+        percent_right_votes = np.zeros(self.n_players)
+        for i in range(self.n_players):
+            if i not in self.spies:
+                # For non-spies, calculate how often they voted for a spy
+                spy_votes = np.sum(votes == spy for spy in self.spies)
+                percent_right_votes[i] = np.mean(spy_votes, axis=0)
+            else:
+                percent_right_votes[i] = np.nan
         series = pd.Series(data=percent_right_votes, index=self.player_names)
         series = series.groupby(series.index).mean()
         return series
@@ -197,11 +228,14 @@ class Game:
 
         if self.game_state == GameState.NO_ONE_INDICTED:
             no_one_indicted_msg = random.choice(NO_ONE_INDICTED_RESPONSE)
-            player = random.choice(list(set(range(self.n_players)) - {self.spy}))
+            player = random.choice(list(set(range(self.n_players)) - set(self.spies)))
             conv_list.append((player, no_one_indicted_msg))
 
-            spy_reveal_msg = random.choice(SPY_REVEAL)
-            conv_list.append((self.spy, spy_reveal_msg))
+            # both spies reveal themselves
+            spy1_reveal_msg = random.choice(SPY_REVEAL)
+            conv_list.append((self.spies[0], spy1_reveal_msg))
+            spy2_reveal_msg = random.choice(SPY_REVEAL)
+            conv_list.append((self.spies[1], spy2_reveal_msg))
 
         df = pd.DataFrame(conv_list, columns=["player", "message"])
         df["player_name"] = df["player"].apply(lambda x: self.player_names[x])
@@ -237,7 +271,7 @@ class Game:
         pygame.init()
 
         # init visualization
-        vis = Visualization(self.player_names, self.spy, self.location.value)
+        vis = Visualization(self.player_names, self.spies, self.location.value)
 
         for round in self.rounds:
             round.render(vis)
@@ -256,7 +290,7 @@ class Game:
         sf.write(path, comb_audio, sr)
 
     def __str__(self):
-        return f"Location: {self.location}, Spy: {self.spy}, Ending: {self.game_state}"
+        return f"Location: {self.location}, Spies: {self.spies}, Ending: {self.game_state}"
 
 
 class Round:
@@ -322,15 +356,39 @@ class Round:
         game.last_questioner = questioner
         game.questioner = self.answerer = answerer
 
-        # spy voting
-        guess = self.spy_guess = await game.players[game.spy].guess_location()
-        assert guess is None or isinstance(guess, Location)
-        if guess == game.location:
-            game.game_state = GameState.SPY_GUESSED_RIGHT
-            return
-        elif guess != None:
-            game.game_state = GameState.SPY_GUESSED_WRONG
-            return
+        # spy voting - handle 2 spies with randomization
+        spy_guesses = []
+        for spy in game.spies:
+            guess = await game.players[spy].guess_location()
+            assert guess is None or isinstance(guess, Location)
+            spy_guesses.append((spy, guess))
+        
+        # Randomize order of spy guesses
+        random.shuffle(spy_guesses)
+        
+        # Check guesses in random order
+        for spy, guess in spy_guesses:
+            if guess == game.location:
+                # Determine which spy guessed correctly
+                if spy == game.spies[0]:
+                    game.game_state = GameState.SPY1_GUESSED_RIGHT
+                else:
+                    game.game_state = GameState.SPY2_GUESSED_RIGHT
+                game.guessing_spy = spy
+                self.spy_guess = guess
+                return
+            elif guess is not None:
+                # Determine which spy guessed incorrectly
+                if spy == game.spies[0]:
+                    game.game_state = GameState.SPY1_GUESSED_WRONG
+                else:
+                    game.game_state = GameState.SPY2_GUESSED_WRONG
+                game.guessing_spy = spy
+                self.spy_guess = guess
+                return
+        
+        # No spy guessed
+        self.spy_guess = None
 
         # collect votes
         votes = await asyncio.gather(
@@ -345,8 +403,13 @@ class Round:
 
         # count votes
         indicted = self.indicted = count_votes(votes, game.n_players)
-        if indicted == game.spy:
-            game.game_state = GameState.SPY_INDICTED
+        if indicted in game.spies:
+            # Determine which spy was indicted
+            if indicted == game.spies[0]:
+                game.game_state = GameState.SPY1_INDICTED
+            else:
+                game.game_state = GameState.SPY2_INDICTED
+            game.indicted_spy = indicted
             return
         elif indicted is not None:
             game.game_state = GameState.NON_SPY_INDICTED
@@ -382,9 +445,9 @@ class Round:
             msg = random.choice(SPY_REVEAL_AND_GUESS).format(
                 location=self.spy_guess.value
             )
-            output.append((game.spy, msg))
-            responder = random.choice(list(set(range(game.n_players)) - {game.spy}))
-            if game.game_state == GameState.SPY_GUESSED_RIGHT:
+            output.append((game.guessing_spy, msg))
+            responder = random.choice(list(set(range(game.n_players)) - set(game.spies)))
+            if game.game_state in [GameState.SPY1_GUESSED_RIGHT, GameState.SPY2_GUESSED_RIGHT]:
                 # random nonspy: yes that is right
                 msg = random.choice(SPY_GUESS_RIGHT_RESPONSE)
             else:
@@ -402,17 +465,17 @@ class Round:
             )
             msg = random.choice(ACCUSATION).format(spy=names[self.indicted])
             output.append((accuser, msg))
-            if game.game_state == GameState.SPY_INDICTED:
+            if game.game_state in [GameState.SPY1_INDICTED, GameState.SPY2_INDICTED]:
                 # spy: I am the spy
                 msg = random.choice(SPY_INDICTED_RESPONSE)
-                output.append((game.spy, msg))
+                output.append((self.indicted, msg))
             else:
                 # indicted: No, I am not the spy
                 msg = random.choice(NON_SPY_INDICTED_RESPONSE)
                 output.append((self.indicted, msg))
                 # spy: I am the spy
                 msg = random.choice(SPY_REVEAL)
-                output.append((game.spy, msg))
+                output.append((game.spies[0], msg))
 
         return output
 
