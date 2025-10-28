@@ -16,7 +16,6 @@ import numpy as np
 import parselmouth
 from gtts import gTTS  # type: ignore
 from parselmouth.praat import call
-from together.error import RateLimitError
 
 from data import *
 
@@ -198,7 +197,7 @@ def rate_limit(requests_per_second: int):
                 wait_time = 0.1
                 try:
                     return await func(*args, **kwargs)
-                except RateLimitError:
+                except:
                     # exponential backoff
                     await asyncio.sleep(wait_time)
                     wait_time *= 1.2

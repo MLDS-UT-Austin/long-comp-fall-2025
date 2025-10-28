@@ -56,16 +56,25 @@ If you use additional packages, please add them to `requirements.txt`.
 
 *Note: this repository is thoroughly type-annotated. To catch type errors, you can install the VSCode Extension `Mypy Type Checker` by Microsoft.*
 
-**<u>Setting up Your LLM API Key</u>**:
+**<u>Setting up Your API Key</u>**:
 
-We will be using [together.ai](https://api.together.ai) which offers a $5 credit (~50M tokens) for new users, no credit card required.
+We will be using [Google Vertex AI](https://console.cloud.google.com/freetrial/?redirectPath=/vertex-ai) which offers $300 in free credits. A credit card is required but only to verify identity. 
 
-To get your API key, click the link above to create an account. A pop-up will appear with your API key.
+***You will not be charged unless you explicitly upgrade your account.***
 
-Next, create a file named `.env` in the root directory with the following text:
+1. Login to your Google account
+2. Enter your credit card information (again, you will not be charged)
+3. Click agree/enable to all pop-ups
+4. Click on "My First Project" at the top left and select "New project"
+5. Create a new project called "long-comp-fall-2025"
+6. Install gcloud cli and login with the following commands. Click "enter" when prompted for a path, "y" to update your $PATH, and "n" to install Python 3.12.
 
-``` text
-TOGETHER_API_KEY = <your_together_api_key>
+``` bash
+curl https://sdk.cloud.google.com | bash
+exec -l $SHELL
+# gcloud init
+gcloud auth application-default login
+gcloud auth application-default set-quota-project long-comp-fall-2025
 ```
 
 **<u>Running Games/Simulations</u>**:

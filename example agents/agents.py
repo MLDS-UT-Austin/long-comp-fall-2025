@@ -716,15 +716,15 @@ class NLPMeeting(Agent):
         self.avg_spy_score = np.zeros(n_players - 1, dtype=float)
 
         """ rerun the embeddings of the question/answer ban
-        self.bert = BERTTogether()
+        self.embedding = GeminiEmbedding()
         self.question_data = pd.read_csv("example agents/all_question_bank.csv")
         # Create embeddings for all questions
         
         self.question_data["question_embedding"] = self.question_data["question"].apply(
-            lambda x: asyncio.get_event_loop().run_until_complete(self.bert.get_embeddings(x))
+            lambda x: asyncio.get_event_loop().run_until_complete(self.embedding.get_embeddings(x))
         )
         self.question_data["answer_embedding"] = self.question_data["answer"].apply(
-            lambda x: asyncio.get_event_loop().run_until_complete(self.bert.get_embeddings(x))
+            lambda x: asyncio.get_event_loop().run_until_complete(self.embedding.get_embeddings(x))
         )
         self.question_data.to_pickle("question_data_with_embeddings.pkl")
         """
