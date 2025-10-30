@@ -122,8 +122,10 @@ VERTEXAI_IS_INITIALIZED = False
 def initialize_vertex_ai():
     global VERTEXAI_IS_INITIALIZED
     if not VERTEXAI_IS_INITIALIZED:
-        # modify this as needed
-        vertexai.init(project="long-comp-fall-2025", location="us-central1")
+        # Get vertex project from environment variable
+        project = os.getenv("GOOGLE_CLOUD_PROJECT")
+        location = os.getenv("GOOGLE_CLOUD_LOCATION")
+        vertexai.init(project=project, location=location)
         VERTEXAI_IS_INITIALIZED = True
 
 
@@ -260,8 +262,8 @@ class DummyEmbedding(Embedding):
         self, text: str | list[str]
     ) -> np.ndarray | list[np.ndarray]:
         if isinstance(text, str):
-            return np.zeros(768)
-        return [np.zeros(768) for _ in text]
+            return np.zeros(3072)  # Updated to match Gemini embedding dimension
+        return [np.zeros(3072) for _ in text]
 
 
 @dataclass
@@ -342,8 +344,8 @@ class TokenCounterWrapper:
         self.remaining_tokens -= math.ceil(self.nlp.count_embedding_tokens(text) / 10)
         if self.remaining_tokens < 0:
             if isinstance(text, str):
-                return np.zeros(768)
-            return [np.zeros(768) for _ in text]
+                return np.zeros(3072)
+            return [np.zeros(3072) for _ in text]
 
         return await self.nlp.get_embeddings(text)
 
