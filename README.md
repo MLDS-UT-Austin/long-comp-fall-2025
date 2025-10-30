@@ -78,6 +78,19 @@ gcloud auth application-default login
 gcloud auth application-default set-quota-project long-comp-fall-2025
 ```
 
+**<u>Verifying Billing is Setup</u>**:
+
+***After setting up your credit card information, you must link it to your project by checking if billing has been enabled. (Note this is not automatic and should be checked as follows)***
+1. Run this to confirm billing is active for your project:
+``` bash
+gcloud beta billing projects describe long-comp-fall-2025
+```
+2. You should see output containing: 
+``` bash
+billingEnabled: true
+```
+3. If billingEnabled: false, then go to Google Cloud Console → Billing → Manage Billing Accounts → Link to Project and attach your billing account.
+
 **<u>Running Games/Simulations</u>**:
 
 See `main.py` for an example of how to run games and simulations.
