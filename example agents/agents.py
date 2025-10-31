@@ -1,3 +1,5 @@
+import asyncio
+import os
 import random
 from collections import Counter
 
@@ -7,7 +9,7 @@ from agent_data import *
 
 from agent import Agent, register_agent
 from data import Location, redaction_dict
-from nlp import LLMRole, NLPProxy
+from nlp import GeminiEmbedding, LLMRole, NLPProxy
 from util import redact
 
 ACCUSE_PROB = 0.9
@@ -715,9 +717,9 @@ class NLPMeeting(Agent):
         # nonspy data
         self.avg_spy_score = np.zeros(n_players - 1, dtype=float)
 
-        """ rerun the embeddings of the question/answer ban
+        """ rerun the embeddings of the question/answer bank
         self.embedding = GeminiEmbedding()
-        self.question_data = pd.read_csv("example agents/all_question_bank.csv")
+        self.question_data = pd.read_csv("all_question_bank.csv")
         # Create embeddings for all questions
         
         self.question_data["question_embedding"] = self.question_data["question"].apply(
