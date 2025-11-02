@@ -34,39 +34,6 @@ class Location(Enum):
     UNIVERSITY = "University"
 
 
-# A dictionary that can optionally be used by agents to redact LLM output based on the location
-# fmt: off
-redaction_dict = {
-    Location.AIRPLANE: ["airplane", "plane", "aircraft", "jet", "flight attendant", "flight", "pilot", "cockpit", "cabin", "turbulence", "boarding", "takeoff", "landing"],
-    Location.BANK: ["bank", "money", "vault", "teller", "robbery", "robber", "heist", "cash", "rob", "atm", "loan", "account", "interest", "deposit", "safe"],
-    Location.BEACH: ["beach", "sand", "ocean", "surf", "waves", "sun", "shell", "towel", "umbrella", "lifeguard"],
-    Location.BROADWAY_THEATER: ["broadway theater", "broadway", "theater", "stage", "musical", "curtain", "play", "actor", "audience", "script"],
-    Location.CASINO: ["casino", "gamble", "chips", "cards", "slot", "blackjack", "dealer", "roulette", "poker", "bet", "baccarat", "craps", "high roller"],
-    Location.CATHEDRAL: ["cathedral", "church", "priest", "altar", "choir", "holy", "religion", "saint", "mass", "bishop", "nun", "confession"],
-    Location.CIRCUS_TENT: ["circus tent", "circus", "tent", "clown", "ringmaster", "elephant", "juggler", "trapeze", "lion", "acrobat"],
-    Location.CORPORATE_PARTY: ["corporate party", "corporate", "party", "boss", "employee", "office", "colleagues"],
-    Location.CRUSADER_ARMY: ["crusader army", "crusader", "crusade", "knight", "sword", "war", "shield", "battle", "siege"],
-    Location.DAY_SPA: ["day spa", "spa", "massage", "facial", "sauna", "pamper", "steam room", "treatment", "manicure"],
-    Location.EMBASSY: ["embassy", "diplomat", "ambassador", "visa", "passport", "consulate", "foreign"],
-    Location.HOSPITAL: ["hospital", "doctor", "nurse", "patient", "surgery", "medic", "stretcher", "ward", "emergency", "diagnosis", "prescription"],
-    Location.HOTEL: ["hotel", "concierge", "lobby", "room service", "suite", "reception"],
-    Location.MILITARY_BASE: ["military base", "military", "base", "tank", "soldier", "barracks", "general", "mission", "drill"],
-    Location.MOVIE_STUDIO: ["movie studio", "movie", "studio", "film", "director", "set", "producer", "actor", "props", "script", "camera"],
-    Location.OCEAN_LINER: ["ocean liner", "liner", "cruise", "deck", "captain", "port", "voyage"],
-    Location.PASSENGER_TRAIN: ["passenger train", "train", "conductor", "rail", "track", "station", "platform", "ticket", "carriage"],
-    Location.PIRATE_SHIP: ["pirate ship", "pirate", "treasure", "parrot", "plank", "cannon", "sail", "buccaneer", "map", "cutlass", "anchor", "mutiny"],
-    Location.POLAR_STATION: ["polar station", "polar", "snow", "ice", "cold", "frozen", "research", "blizzard", "penguin"],
-    Location.POLICE_STATION: ["police station", "police", "officer", "arrest", "criminal", "badge", "detective", "handcuff", "cell", "investigation", "siren", "warrant"],
-    Location.RESTAURANT: ["restaurant", "waiter", "chef", "menu", "dine", "meal", "table", "food", "drink", "reservation", "kitchen", "bill"],
-    Location.SCHOOL: ["school", "teacher", "principal", "teach", "subject", "homework", "classroom", "lesson"],
-    Location.SERVICE_STATION: ["service station", "station", "gas", "mechanic", "repair", "fuel", "oil", "car", "tires", "service", "tune-up", "garage", "brakes"],
-    Location.SPACE_STATION: ["space station", "space", "station", "astronaut", "orbit", "zero gravity", "gravity", "shuttle", "capsule", "moon", "nasa", "spacex", "module", "experiment", "commander"],
-    Location.SUBMARINE: ["submarine", "underwater", "torpedo", "sonar", "deep", "periscope", "dive", "hatch", "crew"],
-    Location.SUPERMARKET: ["supermarket", "store", "cashier", "cart", "groceries", "checkout", "barcode", "aisle", "product", "bag"],
-    Location.UNIVERSITY: ["university", "student", "professor", "lecture", "campus", "degree", "exam", "college", "graduate", "teach", "subject", "faculty", "research", "lecture hall"],
-}
-# fmt: on
-
 # Everthing below is for internal use to generate the game dialogue #####################################
 
 SPY_REVEAL_AND_GUESS = (

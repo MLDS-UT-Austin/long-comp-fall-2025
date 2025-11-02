@@ -343,11 +343,6 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
 
 
 class TestUtil(unittest.TestCase):
-    def test_redact(self):
-        text = "The location is the beach"
-        redacted_text = redact(text, Location.BEACH)
-        self.assertEqual(redacted_text, "The location is the <REDACTED>")
-
     def test_count_votes(self):
         votes = [0, 1, 1, 0, None]
         self.assertEqual(count_votes(votes, len(votes)), None)

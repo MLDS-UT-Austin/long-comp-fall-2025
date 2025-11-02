@@ -8,9 +8,8 @@ import pandas as pd
 from agent_data import *
 
 from agent import Agent, register_agent
-from data import Location, redaction_dict
+from data import Location
 from nlp import GeminiEmbedding, LLMRole, NLPProxy
-from util import redact
 
 ACCUSE_PROB = 0.9
 ACCUSE_NOISE = 0.05
