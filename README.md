@@ -59,7 +59,7 @@ If you use additional packages, please add them to `requirements.txt`.
 
 **<u>Setting up Your API Key</u>**:
 
-We will be using [Google Vertex AI](https://console.cloud.google.com/freetrial/?redirectPath=/vertex-ai) which offers $300 in free credits. A credit card is required but only to verify identity. 
+We will be using [Google Vertex AI](https://console.cloud.google.com/freetrial/?redirectPath=/vertex-ai) which offers $300 in free credits. A credit card is required but only to verify identity.
 
 ***You will not be charged unless you explicitly upgrade your account.***
 
@@ -73,7 +73,6 @@ We will be using [Google Vertex AI](https://console.cloud.google.com/freetrial/?
 ``` bash
 curl https://sdk.cloud.google.com | bash
 exec -l $SHELL
-# gcloud init
 gcloud auth application-default login
 gcloud auth application-default set-quota-project long-comp-fall-2025
 ```

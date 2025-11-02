@@ -24,7 +24,7 @@ import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from vertexai.generative_models import GenerativeModel
+
 import numpy as np
 import torch
 import vertexai
@@ -32,9 +32,12 @@ from transformers import (  # type: ignore
     AutoModelForSequenceClassification,
     AutoTokenizer,
 )
+from vertexai.generative_models import GenerativeModel
 from vertexai.language_models import TextEmbeddingModel
 
-from util import rate_limit
+# Adjust these as needed if you want to change your GC project or location
+GOOGLE_CLOUD_PROJECT = "long-comp-fall-2025"
+GOOGLE_CLOUD_LOCATION = "us-central1"
 
 # This file explains how LLMRole and NLPProxy work, which are used by your agent to interact with the LLM #################
 
@@ -122,10 +125,8 @@ VERTEXAI_IS_INITIALIZED = False
 def initialize_vertex_ai():
     global VERTEXAI_IS_INITIALIZED
     if not VERTEXAI_IS_INITIALIZED:
-        # Get vertex project from environment variable
-        project = os.getenv("GOOGLE_CLOUD_PROJECT")
-        location = os.getenv("GOOGLE_CLOUD_LOCATION")
-        vertexai.init(project=project, location=location)
+        # Get vertex project from global variable variable
+        vertexai.init(project=GOOGLE_CLOUD_PROJECT, location=GOOGLE_CLOUD_LOCATION)
         VERTEXAI_IS_INITIALIZED = True
 
 
@@ -241,7 +242,6 @@ class GeminiEmbedding(Embedding):
         self.model = TextEmbeddingModel.from_pretrained("gemini-embedding-001")
         # google vertex AI, gemini embedding model
 
-    @rate_limit(requests_per_second=50)
     async def get_embeddings(
         self, text: str | list[str]
     ) -> np.ndarray | list[np.ndarray]:
@@ -357,48 +357,50 @@ class TokenCounterWrapper:
 
 
 if __name__ == "__main__":
-    pass
+    # run this to test all the components
     event_loop = asyncio.get_event_loop()
-    # llm_tokenizer = GeminiTokenizer()
-    # tokens = llm_tokenizer.count_tokens("How many US states are there?")
-    # print(tokens)
+    llm_tokenizer = GeminiTokenizer()
+    tokens = llm_tokenizer.count_tokens("How many US states are there?")
+    print(tokens)
 
-    # llm = GeminiLLM()
-    # prompt = [(LLMRole.USER, "How many US states are there?")]
-    # output = event_loop.run_until_complete(llm.prompt(prompt, 100))
-    # print(output)
+    llm = GeminiLLM()
+    prompt = [(LLMRole.USER, "How many US states are there?")]
+    output = event_loop.run_until_complete(llm.prompt(prompt, 100))
+    print(output)
 
-    # embedding_tokenizer = GeminiEmbeddingTokenizer()
-    # tokens = embedding_tokenizer.count_tokens("How many US states are there?")
-    # print(tokens)
+    embedding_tokenizer = GeminiEmbeddingTokenizer()
+    tokens = embedding_tokenizer.count_tokens("How many US states are there?")
+    print(tokens)
 
-    # tokens = embedding_tokenizer.count_tokens(["How many", "US states are there?"])
-    # print(tokens)
+    tokens = embedding_tokenizer.count_tokens(["How many", "US states are there?"])
+    print(tokens)
 
-    # embedding_model = GeminiEmbedding()
-    # output = event_loop.run_until_complete(embedding_model.get_embeddings("How many US states are there?"))
-    # print(type(output))
-    # print(len(output))
+    embedding_model = GeminiEmbedding()
+    output = event_loop.run_until_complete(
+        embedding_model.get_embeddings("How many US states are there?")
+    )
+    print(type(output))
+    print(len(output))
 
-    # output = event_loop.run_until_complete(embedding_model.get_embeddings(["How many", "US states are there?"]))
-    # print(type(output))
-    # print(len(output))
+    output = event_loop.run_until_complete(embedding_model.get_embeddings(["How many", "US states are there?"]))
+    print(type(output))
+    print(len(output))
 
-    # output = event_loop.run_until_complete(
-    #     embedding_model.get_embeddings(["How many", "US states are there?"])
-    # )
-    # print(type(output))
-    # print(len(output))
+    output = event_loop.run_until_complete(
+        embedding_model.get_embeddings(["How many", "US states are there?"])
+    )
+    print(type(output))
+    print(len(output))
 
-    # embedding_model = DummyEmbedding()
-    # output = event_loop.run_until_complete(
-    #     embedding_model.get_embeddings("How many US states are there?")
-    # )
-    # print(type(output))
-    # print(len(output))
+    embedding_model = DummyEmbedding()
+    output = event_loop.run_until_complete(
+        embedding_model.get_embeddings("How many US states are there?")
+    )
+    print(type(output))
+    print(len(output))
 
-    # output = event_loop.run_until_complete(
-    #     embedding_model.get_embeddings(["How many", "US states are there?"])
-    # )
-    # print(type(output))
-    # print(len(output))
+    output = event_loop.run_until_complete(
+        embedding_model.get_embeddings(["How many", "US states are there?"])
+    )
+    print(type(output))
+    print(len(output))
