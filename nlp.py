@@ -212,6 +212,10 @@ class GeminiLLM(LLM):
             )
 
         response = await asyncio.to_thread(generate_sync)
+        
+        # uncomment for debugging prompt/response
+        # concat_prompt = " ".join([f"{role.value}: {text}" for role, text in prompt])
+        # print(f"\tinput: {concat_prompt}\noutput: {response.text}")
 
         # uncomment for debugging token usage
         # print(

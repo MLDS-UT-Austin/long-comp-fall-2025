@@ -1,36 +1,10 @@
-player,message
-2,"Player 1, Would this location smell good?"
-1,answer
-1,"Player 4, question"
-4,Output from the LLM will be here
-4,"Player 3, What time of day is the busiest here?"
-3,Output from the LLM will be here
-3,"Player 2, What time of day is the busiest here?"
-2,Output from the LLM will be here
-2,"Player 1, How far is this location from the nearest public transportation?"
-1,answer
-1,"Player 4, question"
-4,Output from the LLM will be here
-4,"Player 3, Do you need a reservation to visit?"
-3,Output from the LLM will be here
-3,"Player 2, What is there to eat here?"
-2,Output from the LLM will be here
-2,"Player 1, Have you been here before?"
-1,answer
-1,"Player 4, question"
-4,Output from the LLM will be here
-4,"Player 3, How far is this location from the nearest public transportation?"
-3,Output from the LLM will be here
-3,"Player 2, Is this place kid-friendly?"
-2,Output from the LLM will be here
-2,"Player 1, What is there to eat here?"
-1,answer
-1,"Player 3, question"
-3,Output from the LLM will be here
-3,"Player 4, What kind of clothing do people typically wear here?"
-4,Output from the LLM will be here
-4,"Player 2, What is there to eat here?"
-2,Output from the LLM will be here
-4,I have a feeling it's player 2. Are you the spy?
-2,"Nope, not the spy."
-3,Jokes on you all! I was the spy!
+player,player_name,message
+1,MLDS 0,"MLDS 0, Is there a lot of noise in this place?"
+2,MLDS 0,"It can get pretty loud, especially during certain times."
+2,MLDS 0,"MLDS 1, How often do you come here?"
+3,MLDS 1,"Oh, you know, whenever the mood strikes. It varies."
+3,MLDS 1,"NLP Meeting, How far is this location from the nearest public transportation?"
+5,NLP Meeting,"Both options are possible, depending on where you are."
+2,MLDS 0,I suspect NLP Meeting of being the spy. Is it you?
+5,NLP Meeting,You’re wrong! I am not the spy.
+3,MLDS 1,Muah ha ha! I was the spy all along!
