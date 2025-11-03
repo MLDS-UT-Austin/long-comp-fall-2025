@@ -1,4 +1,4 @@
-﻿location,question,answer
+location,question,answer
 General,Do you spend a lot of time sitting or standing here?,It depends on the situation.
 General,Is this place typically noisy or quiet?,"It varies, sometimes it's noisy, other times quiet."
 General,How do people usually dress in this environment?,People dress differently depending on the occasion.
@@ -195,7 +195,7 @@ Zilker Botanical Garden,Do visitors usually walk around or stay in one spot?,"Pe
 Zilker Botanical Garden,Is this place open to the public?,"Yes, it is open to visitors."
 
 South Congress (SoCo),Is this area busy or calm?,"It is usually busy with lots of people."
-South Congress (SoCo),Do people come here to shop, eat, or relax?,"People come to shop, eat, and enjoy the area."
+South Congress (SoCo),"Do people come here to shop, eat, or relax?","People come to shop, eat, and enjoy the area."
 South Congress (SoCo),Are there many different types of shops and attractions?,"Yes, there is a variety of shops and attractions."
 South Congress (SoCo),Do people usually walk around or stay in one place?,"People mostly walk around while exploring."
 South Congress (SoCo),Is this area known for a lively atmosphere?,"Yes, it is known for being lively and vibrant."

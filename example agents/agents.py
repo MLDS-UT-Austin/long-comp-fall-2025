@@ -717,9 +717,11 @@ class NLPMeeting(Agent):
         # nonspy data
         self.avg_spy_score = np.zeros(n_players - 1, dtype=float)
 
-        """ rerun the embeddings of the question/answer bank
+        # Generate embeddings of the question/answer bank
+        import os
         self.embedding = GeminiEmbedding()
-        self.question_data = pd.read_csv("all_question_bank.csv")
+        csv_path = os.path.join(os.path.dirname(__file__), "all_question_bank.csv")
+        self.question_data = pd.read_csv(csv_path)
         # Create embeddings for all questions
         
         self.question_data["question_embedding"] = self.question_data["question"].apply(
@@ -728,9 +730,10 @@ class NLPMeeting(Agent):
         self.question_data["answer_embedding"] = self.question_data["answer"].apply(
             lambda x: asyncio.get_event_loop().run_until_complete(self.embedding.get_embeddings(x))
         )
-        self.question_data.to_pickle("question_data_with_embeddings.pkl")
-        """
-        self.question_data = pd.read_pickle("question_data_with_embeddings.pkl")
+        pkl_path = os.path.join(os.path.dirname(__file__), "question_data_with_embeddings.pkl")
+        self.question_data.to_pickle(pkl_path)
+        # pkl_path = os.path.join(os.path.dirname(__file__), "question_data_with_embeddings.pkl")
+        # self.question_data = pd.read_pickle(pkl_path)
 
         # keeping track of location probability
         self.locs_prob = np.array([0 for loc in Location])
