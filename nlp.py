@@ -198,7 +198,7 @@ class GeminiLLM(LLM):
             Content(role=role.value, parts=[Part(text=text)]) for role, text in prompt
         ]
 
-        # Use asyncio.to_thread to call synchronous GenAI API
+        # Use asyncio.to_thread to significantly speed up blocking calls
         def generate_sync():
             global client
             return client.models.generate_content(
@@ -271,6 +271,7 @@ class GeminiEmbedding(Embedding):
         """Returns embeddings using Vertex AI's textembedding-gecko model."""
         texts = [text] if isinstance(text, str) else text
 
+        # Use asyncio.to_thread to significantly speed up blocking calls
         def get_embeddings_sync():
             # Use batch processing - embed_content can handle a list of texts
             response = client.models.embed_content(
