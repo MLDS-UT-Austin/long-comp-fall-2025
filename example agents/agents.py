@@ -78,28 +78,28 @@ class MLDS0(Agent):
     async def _answer_question_spy(self, question: str) -> str:
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. You are the spy. Answer as vaguely as possible to reduce suspicion."),
+            (LLMRole.USER, f"You are playing a game of spyfall. You are the spy. Answer as vaguely as possible to reduce suspicion."),
             (LLMRole.USER, "How often do you come here?"),
-            (LLMRole.ASSISTANT, "Not as often as some other locations."),
+            (LLMRole.MODEL, "Not as often as some other locations."),
             (LLMRole.USER, "What time of day is the busiest here?"),
-            (LLMRole.ASSISTANT, "It's hard to say, it depends on the week."),
+            (LLMRole.MODEL, "It's hard to say, it depends on the week."),
             (LLMRole.USER, question),
         ]
         # fmt: on
-        answer = await self.nlp.prompt_llm(prompt, 20, 0.25)
+        answer = await self.nlp.prompt_llm(prompt, 40, 0.25)
         return answer
 
     async def _answer_question_nonspy(self, question: str) -> str:
         assert self.location
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. Answer the question based off the location which is the {self.location.value}. DO NOT REVEAL THE LOCATION IN YOUR ANSWER!"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Answer the question based off the location which is the {self.location.value}. DO NOT REVEAL THE LOCATION IN YOUR ANSWER!"),
             (LLMRole.USER, "How often do you come here?"),
-            (LLMRole.ASSISTANT, EXAMPLE_ANSWER[self.location]),
+            (LLMRole.MODEL, EXAMPLE_ANSWER[self.location]),
             (LLMRole.USER, question),
         ]
         # fmt: on
-        answer = await self.nlp.prompt_llm(prompt, 20, 0.25)
+        answer = await self.nlp.prompt_llm(prompt, 40, 0.25)
         return answer
 
     async def answer_question(self, question: str) -> str:
@@ -133,17 +133,17 @@ class MLDS0(Agent):
     ) -> None:
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
+            (LLMRole.USER, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
             (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
-            (LLMRole.ASSISTANT, "Casino"),
+            (LLMRole.MODEL, "Casino"),
             (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
-            (LLMRole.ASSISTANT, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
+            (LLMRole.MODEL, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
             (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
-            (LLMRole.ASSISTANT, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
+            (LLMRole.MODEL, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
-        reponse = await self.nlp.prompt_llm(prompt, 72, 0.25)
+        reponse = await self.nlp.prompt_llm(prompt, 200, 0.25)
         locs = self._get_locs_from_str(reponse)
         for loc in Location:
             if loc in locs:
@@ -161,17 +161,17 @@ class MLDS0(Agent):
         assert self.location
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. Give the probability of the answerer being the spy. The location is the {self.location.value}."),
+            (LLMRole.USER, f"You are playing a game of spyfall. Give the probability of the answerer being the spy. The location is the {self.location.value}."),
             (LLMRole.USER, f"Question: \"{QUESTIONS[2]}\", Answer: \"I don't know\""),
-            (LLMRole.ASSISTANT, "1.0"),
+            (LLMRole.MODEL, "1.0"),
             (LLMRole.USER, f"Question: \"{QUESTIONS[0]}\", Answer: \"{EXAMPLE_BAD_ANSWER[self.location]}\""),
-            (LLMRole.ASSISTANT, "1.0"),
+            (LLMRole.MODEL, "1.0"),
             (LLMRole.USER, f"Question: \"{QUESTIONS[0]}\", Answer: \"{EXAMPLE_ANSWER[self.location]}\""),
-            (LLMRole.ASSISTANT, "0.0"),
+            (LLMRole.MODEL, "0.0"),
             (LLMRole.USER, f"Question: {question}, Answer: {answer}"),
         ]
         # fmt: on
-        reponse = await self.nlp.prompt_llm(prompt, 10, 0.25)
+        reponse = await self.nlp.prompt_llm(prompt, 40, 0.25)
         prob = self._get_float_from_str(reponse)
         if prob is not None:
             # Averaging spy scores per player
@@ -301,28 +301,28 @@ class MLDS1(Agent):
     async def _answer_question_spy(self, question: str) -> str:
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. You are the spy. Answer as vaguely as possible to reduce suspicion."),
+            (LLMRole.USER, f"You are playing a game of spyfall. You are the spy. Answer as vaguely as possible to reduce suspicion."),
             (LLMRole.USER, "How often do you come here?"),
-            (LLMRole.ASSISTANT, "Not as often as some other locations."),
+            (LLMRole.MODEL, "Not as often as some other locations."),
             (LLMRole.USER, "What time of day is the busiest here?"),
-            (LLMRole.ASSISTANT, "It's hard to say, it depends on the week."),
+            (LLMRole.MODEL, "It's hard to say, it depends on the week."),
             (LLMRole.USER, question),
         ]
         # fmt: on
-        answer = await self.nlp.prompt_llm(prompt, 20, 0.25)
+        answer = await self.nlp.prompt_llm(prompt, 40, 0.25)
         return answer
 
     async def _answer_question_nonspy(self, question: str) -> str:
         assert self.location
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. Answer the question based off the location which is the {self.location.value}. DO NOT REVEAL THE LOCATION IN YOUR ANSWER!"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Answer the question based off the location which is the {self.location.value}. DO NOT REVEAL THE LOCATION IN YOUR ANSWER!"),
             (LLMRole.USER, "How often do you come here?"),
-            (LLMRole.ASSISTANT, EXAMPLE_ANSWER[self.location]),
+            (LLMRole.MODEL, EXAMPLE_ANSWER[self.location]),
             (LLMRole.USER, question),
         ]
         # fmt: on
-        answer = await self.nlp.prompt_llm(prompt, 20, 0.25)
+        answer = await self.nlp.prompt_llm(prompt, 40, 0.25)
         return answer
 
     async def answer_question(self, question: str) -> str:
@@ -356,13 +356,13 @@ class MLDS1(Agent):
     ) -> None:
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. List of only the most reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
+            (LLMRole.USER, f"You are playing a game of spyfall. List of only the most reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
             (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
-            (LLMRole.ASSISTANT, "Casino"),
+            (LLMRole.MODEL, "Casino"),
             (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
-            (LLMRole.ASSISTANT, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
+            (LLMRole.MODEL, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
             (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
-            (LLMRole.ASSISTANT, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
+            (LLMRole.MODEL, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
@@ -384,17 +384,17 @@ class MLDS1(Agent):
         assert self.location
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. Give the probability of the answerer being the spy. Be a bit passive about your guesses, but keep in mind people giving vauge answers are more likely to be the spy. The location is the {self.location.value}."),
+            (LLMRole.USER, f"You are playing a game of spyfall. Give the probability of the answerer being the spy. Be a bit passive about your guesses, but keep in mind people giving vauge answers are more likely to be the spy. The location is the {self.location.value}."),
             (LLMRole.USER, f"Question: \"{QUESTIONS[2]}\", Answer: \"I don't know\""),
-            (LLMRole.ASSISTANT, "1.0"),
+            (LLMRole.MODEL, "1.0"),
             (LLMRole.USER, f"Question: \"{QUESTIONS[0]}\", Answer: \"{EXAMPLE_BAD_ANSWER[self.location]}\""),
-            (LLMRole.ASSISTANT, "1.0"),
+            (LLMRole.MODEL, "1.0"),
             (LLMRole.USER, f"Question: \"{QUESTIONS[0]}\", Answer: \"{EXAMPLE_ANSWER[self.location]}\""),
-            (LLMRole.ASSISTANT, "0.0"),
+            (LLMRole.MODEL, "0.0"),
             (LLMRole.USER, f"Question: {question}, Answer: {answer}"),
         ]
         # fmt: on
-        reponse = await self.nlp.prompt_llm(prompt, 10, 0.25)
+        reponse = await self.nlp.prompt_llm(prompt, 40, 0.25)
         prob = self._get_float_from_str(reponse)
         if prob is not None:
             # Averaging spy scores per player
@@ -524,28 +524,28 @@ class MLDS2(Agent):
     async def _answer_question_spy(self, question: str) -> str:
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. You are the spy. Answer as vaguely as possible to reduce suspicion."),
+            (LLMRole.USER, f"You are playing a game of spyfall. You are the spy. Answer as vaguely as possible to reduce suspicion."),
             (LLMRole.USER, "How often do you come here?"),
-            (LLMRole.ASSISTANT, "Not as often as some other locations."),
+            (LLMRole.MODEL, "Not as often as some other locations."),
             (LLMRole.USER, "What time of day is the busiest here?"),
-            (LLMRole.ASSISTANT, "It's hard to say, it depends on the week."),
+            (LLMRole.MODEL, "It's hard to say, it depends on the week."),
             (LLMRole.USER, question),
         ]
         # fmt: on
-        answer = await self.nlp.prompt_llm(prompt, 20, 0.25)
+        answer = await self.nlp.prompt_llm(prompt, 40, 0.25)
         return answer
 
     async def _answer_question_nonspy(self, question: str) -> str:
         assert self.location
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. Answer the question based off the location which is the {self.location.value}. DO NOT REVEAL THE LOCATION IN YOUR ANSWER!"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Answer the question based off the location which is the {self.location.value}. DO NOT REVEAL THE LOCATION IN YOUR ANSWER!"),
             (LLMRole.USER, "How often do you come here?"),
-            (LLMRole.ASSISTANT, EXAMPLE_ANSWER[self.location]),
+            (LLMRole.MODEL, EXAMPLE_ANSWER[self.location]),
             (LLMRole.USER, question),
         ]
         # fmt: on
-        answer = await self.nlp.prompt_llm(prompt, 20, 0.25)
+        answer = await self.nlp.prompt_llm(prompt, 40, 0.25)
         return answer
 
     async def answer_question(self, question: str) -> str:
@@ -579,13 +579,13 @@ class MLDS2(Agent):
     ) -> None:
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
+            (LLMRole.USER, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
             (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
-            (LLMRole.ASSISTANT, "Casino"),
+            (LLMRole.MODEL, "Casino"),
             (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
-            (LLMRole.ASSISTANT, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
+            (LLMRole.MODEL, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
             (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
-            (LLMRole.ASSISTANT, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
+            (LLMRole.MODEL, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
@@ -607,17 +607,17 @@ class MLDS2(Agent):
         assert self.location
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. Give the probability of the answerer being the spy. Keep in mind people giving vauge answers are more likely to be the spy. Be somewhat aggressive in your guesses here. We wanna catch the spy quickly! The location is the {self.location.value}."),
+            (LLMRole.USER, f"You are playing a game of spyfall. Give the probability of the answerer being the spy. Keep in mind people giving vauge answers are more likely to be the spy. Be somewhat aggressive in your guesses here. We wanna catch the spy quickly! The location is the {self.location.value}."),
             (LLMRole.USER, f"Question: \"{QUESTIONS[2]}\", Answer: \"I don't know\""),
-            (LLMRole.ASSISTANT, "1.0"),
+            (LLMRole.MODEL, "1.0"),
             (LLMRole.USER, f"Question: \"{QUESTIONS[0]}\", Answer: \"{EXAMPLE_BAD_ANSWER[self.location]}\""),
-            (LLMRole.ASSISTANT, "1.0"),
+            (LLMRole.MODEL, "1.0"),
             (LLMRole.USER, f"Question: \"{QUESTIONS[0]}\", Answer: \"{EXAMPLE_ANSWER[self.location]}\""),
-            (LLMRole.ASSISTANT, "0.0"),
+            (LLMRole.MODEL, "0.0"),
             (LLMRole.USER, f"Question: {question}, Answer: {answer}"),
         ]
         # fmt: on
-        reponse = await self.nlp.prompt_llm(prompt, 10, 0.25)
+        reponse = await self.nlp.prompt_llm(prompt, 40, 0.25)
         prob = self._get_float_from_str(reponse)
         if prob is not None:
             # Averaging spy scores per player
@@ -716,7 +716,9 @@ class NLPMeeting(Agent):
         # nonspy data
         self.avg_spy_score = np.zeros(n_players - 1, dtype=float)
 
-        assert os.path.exists("question_data_with_embeddings.pkl"), "Please run generate_embeddings.py to generate question_data_with_embeddings.pkl"
+        assert os.path.exists(
+            "question_data_with_embeddings.pkl"
+        ), "Please run generate_embeddings.py to generate question_data_with_embeddings.pkl"
         self.question_data = pd.read_pickle("question_data_with_embeddings.pkl")
 
         # keeping track of location probability
@@ -804,13 +806,13 @@ class NLPMeeting(Agent):
     ) -> None:
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
+            (LLMRole.USER, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
             (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
-            (LLMRole.ASSISTANT, "Casino"),
+            (LLMRole.MODEL, "Casino"),
             (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
-            (LLMRole.ASSISTANT, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
+            (LLMRole.MODEL, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
             (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
-            (LLMRole.ASSISTANT, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
+            (LLMRole.MODEL, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
@@ -832,17 +834,17 @@ class NLPMeeting(Agent):
         assert self.location
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. Give the probability of the answerer being the spy. Keep in mind people giving vauge answers are more likely to be the spy. Be somewhat aggressive in your guesses here. We wanna catch the spy quickly! The location is the {self.location.value}."),
+            (LLMRole.USER, f"You are playing a game of spyfall. Give the probability of the answerer being the spy. Keep in mind people giving vauge answers are more likely to be the spy. Be somewhat aggressive in your guesses here. We wanna catch the spy quickly! The location is the {self.location.value}."),
             (LLMRole.USER, f"Question: \"{QUESTIONS[2]}\", Answer: \"I don't know\""),
-            (LLMRole.ASSISTANT, "1.0"),
+            (LLMRole.MODEL, "1.0"),
             (LLMRole.USER, f"Question: \"{QUESTIONS[0]}\", Answer: \"{EXAMPLE_BAD_ANSWER[self.location]}\""),
-            (LLMRole.ASSISTANT, "1.0"),
+            (LLMRole.MODEL, "1.0"),
             (LLMRole.USER, f"Question: \"{QUESTIONS[0]}\", Answer: \"{EXAMPLE_ANSWER[self.location]}\""),
-            (LLMRole.ASSISTANT, "0.0"),
+            (LLMRole.MODEL, "0.0"),
             (LLMRole.USER, f"Question: {question}, Answer: {answer}"),
         ]
         # fmt: on
-        reponse = await self.nlp.prompt_llm(prompt, 10, 0.25)
+        reponse = await self.nlp.prompt_llm(prompt, 40, 0.25)
         prob = self._get_float_from_str(reponse)
         if prob is not None:
             # Averaging spy scores per player
@@ -918,7 +920,7 @@ class PatternMatcher(Agent):
     Author: Sydney
 
     Agent that uses word frequency analysis and answer patterns to detect spies.
-    
+
     Key differences from existing agents:
     1. Uses word frequency analysis instead of LLM or embeddings
     2. Tracks answer length and repetition patterns
@@ -942,21 +944,25 @@ class PatternMatcher(Agent):
         self.spy = location is None
         self.round = 0
         self.last_questioner = -1
-        
+
         # Track player behavior patterns
         self.player_answers = {i: [] for i in range(1, n_players)}  # Store all answers
-        self.player_word_freq = {i: Counter() for i in range(1, n_players)}  # Word frequency
-        self.player_avg_length = np.zeros(n_players - 1, dtype=float)  # Average answer length
+        self.player_word_freq = {
+            i: Counter() for i in range(1, n_players)
+        }  # Word frequency
+        self.player_avg_length = np.zeros(
+            n_players - 1, dtype=float
+        )  # Average answer length
         self.answerer_count = np.zeros(n_players - 1, dtype=int)
-        
+
         # Suspicion tracking (for 2-spy logic)
         self.suspicion_scores = np.zeros(n_players - 1, dtype=float)
-        
+
         # Spy-specific: track location mentions
         if self.spy:
             self.location_mentions = Counter()
             self.has_guessed = False
-        
+
         # Answer templates based on location type
         self.location_answers = {
             "indoor": [
@@ -985,7 +991,7 @@ class PatternMatcher(Agent):
                 "The experience varies each time.",
             ],
         }
-        
+
         # Vague spy answers
         self.spy_answers = [
             "It's pretty typical, I'd say.",
@@ -995,7 +1001,7 @@ class PatternMatcher(Agent):
             "Hard to describe exactly.",
             "It varies quite a bit.",
         ]
-        
+
         # Question bank
         self.questions = [
             "What brings people here?",
@@ -1018,10 +1024,10 @@ class PatternMatcher(Agent):
         available_players = list(range(1, self.n_players))
         if self.last_questioner != -1 and self.last_questioner in available_players:
             available_players.remove(self.last_questioner)
-        
+
         if len(available_players) == 0:
             available_players = list(range(1, self.n_players))
-        
+
         # Target most suspicious player 40% of the time if we have suspicions
         if not self.spy and self.round > 2:
             max_suspicion_idx = int(np.argmax(self.suspicion_scores))
@@ -1030,7 +1036,7 @@ class PatternMatcher(Agent):
                 if answerer in available_players:
                     question = self.questions[self.round % len(self.questions)]
                     return answerer, question
-        
+
         # Otherwise, prefer players we haven't asked much
         if len(available_players) > 0:
             weights = 1.0 / (self.answerer_count[np.array(available_players) - 1] + 1)
@@ -1038,7 +1044,7 @@ class PatternMatcher(Agent):
             answerer = int(np.random.choice(available_players, p=weights))
         else:
             answerer = random.randint(1, self.n_players - 1)
-        
+
         # Cycle through questions
         question = self.questions[self.round % len(self.questions)]
         return answerer, question
@@ -1048,27 +1054,47 @@ class PatternMatcher(Agent):
         Answer questions using simple rule-based templates.
         """
         question_lower = question.lower()
-        
+
         if self.spy:
             # Spies give vague answers
             return random.choice(self.spy_answers)
         else:
             # Non-spies give category-appropriate answers
             return self._get_location_answer(question_lower)
-    
+
     def _get_location_answer(self, question: str) -> str:
         """Get an answer based on location category."""
         assert self.location is not None
-        
+
         # Categorize locations
-        indoor_locations = ["BANK", "CASINO", "CATHEDRAL", "HOSPITAL", "HOTEL", "RESTAURANT", "SCHOOL", "SUPERMARKET"]
+        indoor_locations = [
+            "BANK",
+            "CASINO",
+            "CATHEDRAL",
+            "HOSPITAL",
+            "HOTEL",
+            "RESTAURANT",
+            "SCHOOL",
+            "SUPERMARKET",
+        ]
         outdoor_locations = ["BEACH", "CIRCUS_TENT", "MILITARY_BASE", "POLAR_STATION"]
-        transport_locations = ["AIRPLANE", "OCEAN_LINER", "PASSENGER_TRAIN", "PIRATE_SHIP", "SPACE_STATION", "SUBMARINE"]
+        transport_locations = [
+            "AIRPLANE",
+            "OCEAN_LINER",
+            "PASSENGER_TRAIN",
+            "PIRATE_SHIP",
+            "SPACE_STATION",
+            "SUBMARINE",
+        ]
         service_locations = ["DAY_SPA", "EMBASSY", "POLICE_STATION", "SERVICE_STATION"]
-        entertainment_locations = ["BROADWAY_THEATER", "CORPORATE_PARTY", "MOVIE_STUDIO"]
-        
+        entertainment_locations = [
+            "BROADWAY_THEATER",
+            "CORPORATE_PARTY",
+            "MOVIE_STUDIO",
+        ]
+
         location_name = self.location.name
-        
+
         if location_name in indoor_locations:
             return random.choice(self.location_answers["indoor"])
         elif location_name in outdoor_locations:
@@ -1093,31 +1119,33 @@ class PatternMatcher(Agent):
         Analyze responses using word frequency and pattern analysis.
         """
         self.last_questioner = questioner
-        
+
         if answerer == 0:  # Skip if we answered
             return
-        
+
         self.answerer_count[answerer - 1] += 1
         answer_lower = answer.lower()
-        
+
         # Store answer
         self.player_answers[answerer].append(answer_lower)
-        
+
         # Update word frequency
         words = answer_lower.split()
         self.player_word_freq[answerer].update(words)
-        
+
         # Update average answer length
         total_length = sum(len(ans) for ans in self.player_answers[answerer])
-        self.player_avg_length[answerer - 1] = total_length / len(self.player_answers[answerer])
-        
+        self.player_avg_length[answerer - 1] = total_length / len(
+            self.player_answers[answerer]
+        )
+
         if self.spy:
             # As spy: look for location clues in answers
             self._analyze_as_spy(answer_lower)
         else:
             # As non-spy: detect suspicious patterns
             self._analyze_as_nonspy(answerer, answer_lower)
-    
+
     def _analyze_as_spy(self, answer: str):
         """Look for location mentions to guess where we are."""
         # Track common words that might indicate location type
@@ -1128,36 +1156,53 @@ class PatternMatcher(Agent):
             "transport": ["travel", "journey", "destination", "arrive"],
             "service": ["help", "service", "staff", "customer"],
         }
-        
+
         for category, keywords in location_hints.items():
             for keyword in keywords:
                 if keyword in answer:
                     self.location_mentions[category] += 1
-    
+
     def _analyze_as_nonspy(self, answerer: int, answer: str):
         """Detect spies using pattern analysis."""
         # Vague words that spies might use
-        vague_indicators = ["depends", "varies", "sometimes", "maybe", "typical", 
-                           "similar", "usually", "often", "generally", "kind of"]
-        
+        vague_indicators = [
+            "depends",
+            "varies",
+            "sometimes",
+            "maybe",
+            "typical",
+            "similar",
+            "usually",
+            "often",
+            "generally",
+            "kind of",
+        ]
+
         # Specific words that non-spies would use
-        specific_indicators = ["always", "never", "exactly", "specifically", 
-                              "definitely", "particular", "certain"]
-        
+        specific_indicators = [
+            "always",
+            "never",
+            "exactly",
+            "specifically",
+            "definitely",
+            "particular",
+            "certain",
+        ]
+
         vague_count = sum(1 for word in vague_indicators if word in answer)
         specific_count = sum(1 for word in specific_indicators if word in answer)
-        
+
         # Short answers are suspicious
         length_penalty = 0
         if len(answer) < 30:
             length_penalty = 1.0
         elif len(answer) < 50:
             length_penalty = 0.5
-        
+
         # Calculate suspicion
         suspicion_delta = vague_count - specific_count + length_penalty
         self.suspicion_scores[answerer - 1] += suspicion_delta
-        
+
         # Check for repetitive answers (spies might reuse templates)
         if len(self.player_answers[answerer]) >= 2:
             last_two = self.player_answers[answerer][-2:]
@@ -1172,33 +1217,37 @@ class PatternMatcher(Agent):
         """
         if not self.spy or self.has_guessed:
             return None
-        
+
         # Need at least 3 rounds of data
         if self.round < 3:
             return None
-        
+
         # Only guess if we have strong hints
         if len(self.location_mentions) == 0:
             return None
-        
+
         most_common_category = self.location_mentions.most_common(1)[0]
-        
+
         # Need at least 4 mentions to be confident
         if most_common_category[1] < 4:
             return None
-        
+
         # Map categories to likely locations (simplified)
         category_to_locations = {
             "water": [Location.OCEAN_LINER, Location.PIRATE_SHIP, Location.SUBMARINE],
-            "transport": [Location.AIRPLANE, Location.PASSENGER_TRAIN, Location.SPACE_STATION],
+            "transport": [
+                Location.AIRPLANE,
+                Location.PASSENGER_TRAIN,
+                Location.SPACE_STATION,
+            ],
             "service": [Location.HOSPITAL, Location.POLICE_STATION, Location.DAY_SPA],
         }
-        
+
         category = most_common_category[0]
         if category in category_to_locations:
             self.has_guessed = True
             return random.choice(category_to_locations[category])
-        
+
         return None
 
     async def accuse_player(self) -> int | None:
@@ -1211,25 +1260,25 @@ class PatternMatcher(Agent):
             if random.random() < 0.3:  # Don't always vote
                 return random.randint(1, self.n_players - 1)
             return None
-        
+
         # As non-spy: accuse based on suspicion scores
         # Need at least 2 rounds of data
         if self.round < 2:
             return None
-        
+
         # Find most suspicious player
         max_suspicion_idx = int(np.argmax(self.suspicion_scores))
         max_suspicion = self.suspicion_scores[max_suspicion_idx]
-        
+
         # Adaptive threshold: lower in late game
         threshold = 3.0 if self.round < self.n_rounds // 2 else 2.0
-        
+
         # Only accuse if suspicion exceeds threshold
         if max_suspicion > threshold and self.answerer_count[max_suspicion_idx] >= 2:
             # 40% chance to actually vote (conservative)
             if random.random() < 0.4:
                 return max_suspicion_idx + 1
-        
+
         return None
 
     async def analyze_voting(self, votes: list[int | None]) -> None:
@@ -1237,10 +1286,10 @@ class PatternMatcher(Agent):
         Analyze voting patterns to refine suspicions.
         """
         self.round += 1
-        
+
         # Count votes
         vote_counts = Counter([v for v in votes if v is not None])
-        
+
         if not self.spy and len(vote_counts) > 0:
             # If many people vote for someone, they might be onto something
             for player, count in vote_counts.items():

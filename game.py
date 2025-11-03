@@ -205,13 +205,8 @@ class Game:
 
         # Calculate percent right votes for each spy
         percent_right_votes = np.zeros(self.n_players)
-        for i in range(self.n_players):
-            if i not in self.spies:
-                # For non-spies, calculate how often they voted for a spy
-                spy_votes = np.sum(votes == spy for spy in self.spies)
-                percent_right_votes[i] = np.mean(spy_votes, axis=0)
-            else:
-                percent_right_votes[i] = np.nan
+        for i in self.spies:
+            percent_right_votes += np.mean(votes == i, axis=0)
         series = pd.Series(data=percent_right_votes, index=self.player_names)
         series = series.groupby(series.index).mean()
         return series

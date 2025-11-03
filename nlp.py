@@ -19,21 +19,13 @@ warnings.filterwarnings(
 
 import asyncio
 import math
-import os
-import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
 
 import numpy as np
-import torch
-import vertexai
-from transformers import (  # type: ignore
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-)
-from vertexai.generative_models import GenerativeModel
-from vertexai.language_models import TextEmbeddingModel
+from google import genai
+from google.genai.types import Content, GenerateContentConfig, Part, ThinkingConfig
 
 # Adjust these as needed if you want to change your GC project or location
 GOOGLE_CLOUD_PROJECT = "long-comp-fall-2025"
@@ -43,9 +35,8 @@ GOOGLE_CLOUD_LOCATION = "us-central1"
 
 
 class LLMRole(Enum):
-    SYSTEM = "system"
     USER = "user"
-    ASSISTANT = "assistant"
+    MODEL = "model"
 
 
 class NLPProxy:
@@ -66,8 +57,8 @@ class NLPProxy:
 
         Args:
             prompt (list[tuple[LLMRole, str]]): List of tuples containing the role and text.
-                Use LLMRole.SYSTEM to give the llm background information and LLMRole.USER for user input.
-                LLMRole.ASSISTANT can be used to give the llm an example of how to respond.
+                Use LLMRole.USER to give the llm the prompt and any background information.
+                LLMRole.MODEL can be used to give the llm an example of how to respond.
 
             max_output_tokens (int | None, optional): The maximum number of tokens to output or None for no limit
 
@@ -119,15 +110,17 @@ class NLPProxy:
 
 # Everything below is for internal use only ####################################################################
 
-VERTEXAI_IS_INITIALIZED = False
+GENAI_IS_INITIALIZED = False
 
 
-def initialize_vertex_ai():
-    global VERTEXAI_IS_INITIALIZED
-    if not VERTEXAI_IS_INITIALIZED:
-        # Get vertex project from global variable variable
-        vertexai.init(project=GOOGLE_CLOUD_PROJECT, location=GOOGLE_CLOUD_LOCATION)
-        VERTEXAI_IS_INITIALIZED = True
+def initialize_genai():
+    global GENAI_IS_INITIALIZED
+    global client
+    if not GENAI_IS_INITIALIZED:
+        client = genai.Client(
+            vertexai=True, project=GOOGLE_CLOUD_PROJECT, location=GOOGLE_CLOUD_LOCATION
+        )
+        GENAI_IS_INITIALIZED = True
 
 
 # Interfaces ####################################################################
@@ -169,42 +162,64 @@ class Embedding(ABC):
 
 class GeminiTokenizer(LLMTokenizer):
     def __init__(self):
-        initialize_vertex_ai()
-        self.model = GenerativeModel("gemini-2.5-flash")
+        initialize_genai()
+        self.model_name = "gemini-2.5-flash"
 
-    def count_tokens(self, text_or_prompt: str | list[tuple[str, str]]) -> int:
+    def count_tokens(self, text_or_prompt: str | list[tuple[LLMRole, str]]) -> int:
         if isinstance(text_or_prompt, list):
-            text = "\n".join([f"{role}: {content}" for role, content in text_or_prompt])
+            contents = [
+                Content(role=role.value, parts=[Part(text=text)])
+                for role, text in text_or_prompt
+            ]
         else:
-            text = text_or_prompt
+            if text_or_prompt == "":
+                return 0
+            contents = text_or_prompt
 
-        token_info = self.model.count_tokens(text)
+        token_info = client.models.count_tokens(
+            model=self.model_name, contents=contents
+        )
         return token_info.total_tokens
 
 
 class GeminiLLM(LLM):
-    def __init__(self, model_name: str = "gemini-2.5-flash"):
-        super().__init__()
-        initialize_vertex_ai()
-        self.model = GenerativeModel(model_name)
+    def __init__(self):
+        initialize_genai()
+        self.model_name = "gemini-2.5-flash"
 
     async def prompt(
         self,
-        prompt: list[tuple[str, str]],
+        prompt: list[tuple[LLMRole, str]],
         max_output_tokens: int | None = None,
         temperature: float = 0.7,
     ) -> str:
-        # Flatten role/content into a single string
-        text = "\n".join([f"{role}: {content}" for role, content in prompt])
+        # Convert role/content tuples to GenAI Message objects
+        contents = [
+            Content(role=role.value, parts=[Part(text=text)]) for role, text in prompt
+        ]
 
-        # Generate text
-        response = self.model.generate_content(
-            text,
-            generation_config={
-                "temperature": temperature,
-                "max_output_tokens": max_output_tokens,
-            },
-        )
+        # Use asyncio.to_thread to call synchronous GenAI API
+        def generate_sync():
+            global client
+            return client.models.generate_content(
+                model=self.model_name,
+                contents=contents,
+                config=GenerateContentConfig(
+                    temperature=temperature,
+                    max_output_tokens=max_output_tokens,
+                    thinking_config=ThinkingConfig(thinking_budget=0),
+                ),
+            )
+
+        response = await asyncio.to_thread(generate_sync)
+
+        # uncomment for debugging token usage
+        # print(
+        #     f"input tokens: {response.usage_metadata.prompt_token_count}, "
+        #     f"thinking tokens: {response.usage_metadata.thoughts_token_count}, "
+        #     f"max_output_tokens: {max_output_tokens}, "
+        #     f"output: {response.text}"
+        # )
         return response.text
 
 
@@ -223,24 +238,32 @@ class DummyLLM(LLM):
 class GeminiEmbeddingTokenizer(EmbeddingTokenizer):
     # set location to "us-central1"
     def __init__(self):
-        initialize_vertex_ai()
-        self.model = TextEmbeddingModel.from_pretrained("gemini-embedding-001")
+        initialize_genai()
+        # gemini-embedding-001 does not work, but we can estimate with gemini-2.5-flash
+        # self.model_name = "gemini-embedding-001"
+        self.model_name = "gemini-2.5-flash"
 
     def count_tokens(self, text: str | list[str]) -> int:
+        global client
         texts = [text] if isinstance(text, str) else text
-        total = 0
-        for t in texts:
-            token_info = self.model.count_tokens(t)
-            total += token_info.total_tokens
-        return total
+
+        # Filter out empty strings
+        non_empty_texts = [t for t in texts if t != ""]
+
+        if not non_empty_texts:
+            return 0
+
+        combined_text = " ".join(non_empty_texts)
+        token_info = client.models.count_tokens(
+            model=self.model_name, contents=combined_text
+        )
+        return token_info.total_tokens
 
 
 class GeminiEmbedding(Embedding):
     def __init__(self):
-        super().__init__()
-        initialize_vertex_ai()
-        self.model = TextEmbeddingModel.from_pretrained("gemini-embedding-001")
-        # google vertex AI, gemini embedding model
+        initialize_genai()
+        self.model_name = "gemini-embedding-001"
 
     async def get_embeddings(
         self, text: str | list[str]
@@ -248,9 +271,16 @@ class GeminiEmbedding(Embedding):
         """Returns embeddings using Vertex AI's textembedding-gecko model."""
         texts = [text] if isinstance(text, str) else text
 
-        # Vertex API call (synchronous by default, so run in async context safely)
-        embeddings_response = self.model.get_embeddings(texts)
-        embeddings = [np.array(e.values) for e in embeddings_response]
+        def get_embeddings_sync():
+            # Use batch processing - embed_content can handle a list of texts
+            response = client.models.embed_content(
+                model=self.model_name, contents=texts
+            )
+            # Extract embeddings from response
+            embeddings = [np.array(emb.values) for emb in response.embeddings]
+            return embeddings
+
+        embeddings = await asyncio.to_thread(get_embeddings_sync)
 
         if isinstance(text, str):
             return embeddings[0]
@@ -359,13 +389,14 @@ class TokenCounterWrapper:
 if __name__ == "__main__":
     # run this to test all the components
     event_loop = asyncio.get_event_loop()
+
     llm_tokenizer = GeminiTokenizer()
     tokens = llm_tokenizer.count_tokens("How many US states are there?")
     print(tokens)
 
     llm = GeminiLLM()
     prompt = [(LLMRole.USER, "How many US states are there?")]
-    output = event_loop.run_until_complete(llm.prompt(prompt, 100))
+    output = event_loop.run_until_complete(llm.prompt(prompt, 20))
     print(output)
 
     embedding_tokenizer = GeminiEmbeddingTokenizer()
@@ -379,10 +410,13 @@ if __name__ == "__main__":
     output = event_loop.run_until_complete(
         embedding_model.get_embeddings("How many US states are there?")
     )
+    print(f"first 5: {output[:5]}")
     print(type(output))
     print(len(output))
 
-    output = event_loop.run_until_complete(embedding_model.get_embeddings(["How many", "US states are there?"]))
+    output = event_loop.run_until_complete(
+        embedding_model.get_embeddings(["How many", "US states are there?"])
+    )
     print(type(output))
     print(len(output))
 
@@ -396,11 +430,14 @@ if __name__ == "__main__":
     output = event_loop.run_until_complete(
         embedding_model.get_embeddings("How many US states are there?")
     )
+    print(f"first 5: {output[:5]}")
     print(type(output))
     print(len(output))
 
     output = event_loop.run_until_complete(
         embedding_model.get_embeddings(["How many", "US states are there?"])
     )
+    print(type(output))
+    print(len(output))
     print(type(output))
     print(len(output))
