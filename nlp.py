@@ -78,14 +78,14 @@ class NLPProxy:
     async def get_embeddings(
         self, text: str | list[str]
     ) -> np.ndarray | list[np.ndarray]:
-        """Gets a 768-dimensional embedding for the given text
+        """Gets a 3072-dimensional embedding for the given text
 
         Args:
             text (str): Input text. This will counted against the token limit but at a lesser extent than the llm.
                 Every 10 tokens inputted into the embedding model is equivalent to 1 token inputted into the llm.
 
         Returns:
-            np.ndarray: 768-dimensional embedding
+            np.ndarray: 3072-dimensional embedding
         """
         return await self.__token_counter.get_embeddings(text)
 
@@ -373,7 +373,7 @@ class TokenCounterWrapper:
             output = await self.nlp.prompt_llm(prompt, max_output_tokens, temperature)
             self.remaining_tokens -= self.nlp.count_llm_tokens(output)
 
-            if self.remaining_tokens <= 0:
+            if self.remaining_tokens < 0:
                 output += " <out of tokens>"
 
         if LLM_VERBOSE:
