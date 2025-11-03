@@ -118,7 +118,7 @@ class Game:
 
         for i, player_class_name in enumerate(player_names):
             player_class = AGENT_REGISTRY[player_class_name]
-            player_nlp = TokenCounterWrapper(nlp)
+            player_nlp = TokenCounterWrapper(nlp, player_name=player_class_name)
             given_location = self.location if i not in self.spies else None
             player_instance = player_class(
                 given_location, n_players, n_rounds, nlp=NLPProxy(player_nlp)

@@ -27,6 +27,10 @@ import numpy as np
 from google import genai
 from google.genai.types import Content, GenerateContentConfig, Part, ThinkingConfig
 
+
+# Set this to True to print out all LLM calls for debugging
+LLM_VERBOSE = False
+
 # Adjust these as needed if you want to change your GC project or location
 GOOGLE_CLOUD_PROJECT = "long-comp-fall-2025"
 GOOGLE_CLOUD_LOCATION = "us-central1"
@@ -342,6 +346,7 @@ class TokenCounterWrapper:
 
     nlp: NLP = field(default_factory=NLP)
     token_limit: int = 1000
+    player_name: str | None = None
 
     def __post_init__(self):
         self.reset_token_counter()
@@ -370,6 +375,18 @@ class TokenCounterWrapper:
 
             if self.remaining_tokens <= 0:
                 output += " <out of tokens>"
+
+        if LLM_VERBOSE:
+            prompt_text = " ".join(
+                [f"{role.value}: {text}" for role, text in prompt]
+            )
+            player_info = (
+                f" for player {self.player_name}" if self.player_name else ""
+            )
+            print(
+                f"[LLM call{player_info}]\n\tInput: {prompt_text}\n\tOutput: {output}\n"
+            )
+
 
         return output
 
