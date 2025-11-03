@@ -78,7 +78,7 @@ class MLDS0(Agent):
     async def _answer_question_spy(self, question: str) -> str:
         # fmt: off
         prompt = [
-            (LLMRole.USER, f"You are playing a game of spyfall. You are the spy. Answer as vaguely as possible to reduce suspicion."),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. You are the spy. Answer as vaguely as possible to reduce suspicion."),
             (LLMRole.USER, "How often do you come here?"),
             (LLMRole.MODEL, "Not as often as some other locations."),
             (LLMRole.USER, "What time of day is the busiest here?"),
@@ -93,7 +93,7 @@ class MLDS0(Agent):
         assert self.location
         # fmt: off
         prompt = [
-            (LLMRole.USER, f"You are playing a game of spyfall. Answer the question based off the location which is the {self.location.value}. DO NOT REVEAL THE LOCATION IN YOUR ANSWER!"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. Answer the question based off the location which is the {self.location.value}. DO NOT REVEAL THE LOCATION IN YOUR ANSWER!"),
             (LLMRole.USER, "How often do you come here?"),
             (LLMRole.MODEL, EXAMPLE_ANSWER[self.location]),
             (LLMRole.USER, question),
@@ -133,7 +133,7 @@ class MLDS0(Agent):
     ) -> None:
         # fmt: off
         prompt = [
-            (LLMRole.USER, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
             (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
             (LLMRole.MODEL, "Casino"),
             (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
@@ -161,7 +161,7 @@ class MLDS0(Agent):
         assert self.location
         # fmt: off
         prompt = [
-            (LLMRole.USER, f"You are playing a game of spyfall. Give the probability of the answerer being the spy. The location is the {self.location.value}."),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. Give the probability of the answerer being the spy. The location is the {self.location.value}."),
             (LLMRole.USER, f"Question: \"{QUESTIONS[2]}\", Answer: \"I don't know\""),
             (LLMRole.MODEL, "1.0"),
             (LLMRole.USER, f"Question: \"{QUESTIONS[0]}\", Answer: \"{EXAMPLE_BAD_ANSWER[self.location]}\""),
@@ -301,7 +301,7 @@ class MLDS1(Agent):
     async def _answer_question_spy(self, question: str) -> str:
         # fmt: off
         prompt = [
-            (LLMRole.USER, f"You are playing a game of spyfall. You are the spy. Answer as vaguely as possible to reduce suspicion."),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. You are the spy. Answer as vaguely as possible to reduce suspicion."),
             (LLMRole.USER, "How often do you come here?"),
             (LLMRole.MODEL, "Not as often as some other locations."),
             (LLMRole.USER, "What time of day is the busiest here?"),
@@ -316,7 +316,7 @@ class MLDS1(Agent):
         assert self.location
         # fmt: off
         prompt = [
-            (LLMRole.USER, f"You are playing a game of spyfall. Answer the question based off the location which is the {self.location.value}. DO NOT REVEAL THE LOCATION IN YOUR ANSWER!"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. Answer the question based off the location which is the {self.location.value}. DO NOT REVEAL THE LOCATION IN YOUR ANSWER!"),
             (LLMRole.USER, "How often do you come here?"),
             (LLMRole.MODEL, EXAMPLE_ANSWER[self.location]),
             (LLMRole.USER, question),
@@ -356,7 +356,7 @@ class MLDS1(Agent):
     ) -> None:
         # fmt: off
         prompt = [
-            (LLMRole.USER, f"You are playing a game of spyfall. List of only the most reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. List of only the most reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
             (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
             (LLMRole.MODEL, "Casino"),
             (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
@@ -384,7 +384,7 @@ class MLDS1(Agent):
         assert self.location
         # fmt: off
         prompt = [
-            (LLMRole.USER, f"You are playing a game of spyfall. Give the probability of the answerer being the spy. Be a bit passive about your guesses, but keep in mind people giving vauge answers are more likely to be the spy. The location is the {self.location.value}."),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. Give the probability of the answerer being the spy. Be a bit passive about your guesses, but keep in mind people giving vauge answers are more likely to be the spy. The location is the {self.location.value}."),
             (LLMRole.USER, f"Question: \"{QUESTIONS[2]}\", Answer: \"I don't know\""),
             (LLMRole.MODEL, "1.0"),
             (LLMRole.USER, f"Question: \"{QUESTIONS[0]}\", Answer: \"{EXAMPLE_BAD_ANSWER[self.location]}\""),
@@ -524,7 +524,7 @@ class MLDS2(Agent):
     async def _answer_question_spy(self, question: str) -> str:
         # fmt: off
         prompt = [
-            (LLMRole.USER, f"You are playing a game of spyfall. You are the spy. Answer as vaguely as possible to reduce suspicion."),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. You are the spy. Answer as vaguely as possible to reduce suspicion."),
             (LLMRole.USER, "How often do you come here?"),
             (LLMRole.MODEL, "Not as often as some other locations."),
             (LLMRole.USER, "What time of day is the busiest here?"),
@@ -539,7 +539,7 @@ class MLDS2(Agent):
         assert self.location
         # fmt: off
         prompt = [
-            (LLMRole.USER, f"You are playing a game of spyfall. Answer the question based off the location which is the {self.location.value}. DO NOT REVEAL THE LOCATION IN YOUR ANSWER!"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. Answer the question based off the location which is the {self.location.value}. DO NOT REVEAL THE LOCATION IN YOUR ANSWER!"),
             (LLMRole.USER, "How often do you come here?"),
             (LLMRole.MODEL, EXAMPLE_ANSWER[self.location]),
             (LLMRole.USER, question),
@@ -579,7 +579,7 @@ class MLDS2(Agent):
     ) -> None:
         # fmt: off
         prompt = [
-            (LLMRole.USER, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. Your response is being parsed by code, so respond like a robot. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
             (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
             (LLMRole.MODEL, "Casino"),
             (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
@@ -607,7 +607,7 @@ class MLDS2(Agent):
         assert self.location
         # fmt: off
         prompt = [
-            (LLMRole.USER, f"You are playing a game of spyfall. Give the probability of the answerer being the spy. Keep in mind people giving vauge answers are more likely to be the spy. Be somewhat aggressive in your guesses here. We wanna catch the spy quickly! The location is the {self.location.value}."),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. Give the probability of the answerer being the spy. Keep in mind people giving vauge answers are more likely to be the spy. Be somewhat aggressive in your guesses here. We wanna catch the spy quickly! The location is the {self.location.value}."),
             (LLMRole.USER, f"Question: \"{QUESTIONS[2]}\", Answer: \"I don't know\""),
             (LLMRole.MODEL, "1.0"),
             (LLMRole.USER, f"Question: \"{QUESTIONS[0]}\", Answer: \"{EXAMPLE_BAD_ANSWER[self.location]}\""),
@@ -806,7 +806,7 @@ class NLPMeeting(Agent):
     ) -> None:
         # fmt: off
         prompt = [
-            (LLMRole.USER, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
             (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
             (LLMRole.MODEL, "Casino"),
             (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
