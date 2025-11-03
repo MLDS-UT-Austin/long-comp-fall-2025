@@ -29,7 +29,7 @@ if __name__ == "__main__":
     
     print("Creating NLP Meeting agent instance...")
     agent = AGENT_REGISTRY["NLP Meeting"](
-        location=Location.AIRPLANE,  # Dummy location for testing
+        location=Location.BLANTON_MUSEUM_OF_ART,  # Dummy location for testing
         n_players=4,
         n_rounds=20,
         nlp=nlp

@@ -10,8 +10,10 @@ from collections import Counter
 import numpy as np
 
 from agent import Agent, register_agent
-from data import Location
+from agent_data import EXAMPLE_ANSWER
+from data import Location, redaction_dict
 from nlp import NLPProxy
+from util import redact
 
 
 @register_agent("Pattern Matcher")
@@ -69,10 +71,10 @@ class PatternMatcher(Agent):
                 "It's nice when the conditions are right.",
                 "Being outside is part of the appeal.",
             ],
-            "transport": [
-                "You need to get from one place to another.",
-                "It's about the journey, really.",
-                "Timing is important here.",
+            "water": [
+                "The water is refreshing.",
+                "It's peaceful near the water.",
+                "You can see nature around here.",
             ],
             "service": [
                 "People come here for a specific purpose.",
@@ -153,30 +155,48 @@ class PatternMatcher(Agent):
             # Spies give vague answers
             return random.choice(self.spy_answers)
         else:
-            # Non-spies give category-appropriate answers
-            return self._get_location_answer(question_lower)
+            # Use EXAMPLE_ANSWER for frequency questions
+            if "often" in question_lower or "come here" in question_lower:
+                answer = EXAMPLE_ANSWER[self.location]
+            else:
+                # Non-spies give category-appropriate answers
+                answer = self._get_location_answer(question_lower)
+            
+            # Redact location-specific words
+            answer = redact(answer, redaction_dict[self.location])
+            return answer
     
     def _get_location_answer(self, question: str) -> str:
         """Get an answer based on location category."""
         assert self.location is not None
         
-        # Categorize locations
-        indoor_locations = ["BANK", "CASINO", "CATHEDRAL", "HOSPITAL", "HOTEL", "RESTAURANT", "SCHOOL", "SUPERMARKET"]
-        outdoor_locations = ["BEACH", "CIRCUS_TENT", "MILITARY_BASE", "POLAR_STATION"]
-        transport_locations = ["AIRPLANE", "OCEAN_LINER", "PASSENGER_TRAIN", "PIRATE_SHIP", "SPACE_STATION", "SUBMARINE"]
-        service_locations = ["DAY_SPA", "EMBASSY", "POLICE_STATION", "SERVICE_STATION"]
-        entertainment_locations = ["BROADWAY_THEATER", "CORPORATE_PARTY", "MOVIE_STUDIO"]
+        # Categorize NEW Austin/UT locations
+        indoor_locations = [
+            "BLANTON_MUSEUM_OF_ART", "HARRY_RANSOM_CENTER", "LBJ_LIBRARY_AND_MUSEUM",
+            "FLAWN_ACADEMIC_CENTER", "ART_BUILDING_AND_MUSEUM", "GATES_DELL_COMPLEX",
+            "CHRISTIAN_GREEN_GALLERY", "FINE_ARTS_LIBRARY", "GREGORY_GYM",
+            "TEXAS_MEMORIAL_MUSEUM", "NORMAN_HACKERMAN_BUILDING", "WCP_STUDENT_ACTIVITY_CENTER"
+        ]
+        outdoor_locations = [
+            "DARRELL_K_ROYAL_TEXAS_MEMORIAL_STADIUM", "UT_TOWER", "LITTLEFIELD_FOUNTAIN",
+            "TURTLE_POND", "THE_DRAG", "MT_BONNELL_AND_MAYFIELD_PARK", "ZILKER_PARK",
+            "LADY_BIRD_JOHNSON_WILDFLOWER_CENTER", "ZILKER_BOTANICAL_GARDEN",
+            "CONGRESS_AVENUE_BRIDGE", "SOUTH_CONGRESS_SOCO"
+        ]
+        water_locations = ["BARTON_SPRINGS", "LAKE_AUSTIN", "TURTLE_POND"]
+        government_locations = ["TEXAS_STATE_CAPITOL", "LBJ_LIBRARY_AND_MUSEUM"]
+        entertainment_locations = ["DARRELL_K_ROYAL_TEXAS_MEMORIAL_STADIUM", "SOUTH_CONGRESS_SOCO"]
         
         location_name = self.location.name
         
-        if location_name in indoor_locations:
+        if location_name in water_locations:
+            return random.choice(self.location_answers["water"])
+        elif location_name in government_locations:
+            return random.choice(self.location_answers["service"])
+        elif location_name in indoor_locations:
             return random.choice(self.location_answers["indoor"])
         elif location_name in outdoor_locations:
             return random.choice(self.location_answers["outdoor"])
-        elif location_name in transport_locations:
-            return random.choice(self.location_answers["transport"])
-        elif location_name in service_locations:
-            return random.choice(self.location_answers["service"])
         elif location_name in entertainment_locations:
             return random.choice(self.location_answers["entertainment"])
         else:
@@ -220,13 +240,13 @@ class PatternMatcher(Agent):
     
     def _analyze_as_spy(self, answer: str):
         """Look for location mentions to guess where we are."""
-        # Track common words that might indicate location type
+        # Track common words that might indicate location type (Austin/UT context)
         location_hints = {
-            "indoor": ["inside", "building", "room", "floor", "ceiling"],
-            "outdoor": ["outside", "weather", "sky", "sun", "air"],
-            "water": ["water", "ocean", "sea", "boat", "ship"],
-            "transport": ["travel", "journey", "destination", "arrive"],
-            "service": ["help", "service", "staff", "customer"],
+            "indoor": ["inside", "building", "museum", "library", "gallery", "center", "room", "floor"],
+            "outdoor": ["outside", "weather", "park", "fountain", "tower", "nature", "sky", "sun"],
+            "water": ["water", "swim", "pool", "lake", "spring", "pond", "river"],
+            "campus": ["students", "study", "class", "university", "campus", "academic"],
+            "government": ["capitol", "government", "historic", "official", "presidential"],
         }
         
         for category, keywords in location_hints.items():
@@ -287,11 +307,16 @@ class PatternMatcher(Agent):
         if most_common_category[1] < 4:
             return None
         
-        # Map categories to likely locations (simplified)
+        # Map categories to likely locations (Austin/UT locations)
         category_to_locations = {
-            "water": [Location.OCEAN_LINER, Location.PIRATE_SHIP, Location.SUBMARINE],
-            "transport": [Location.AIRPLANE, Location.PASSENGER_TRAIN, Location.SPACE_STATION],
-            "service": [Location.HOSPITAL, Location.POLICE_STATION, Location.DAY_SPA],
+            "water": [Location.BARTON_SPRINGS, Location.LAKE_AUSTIN, Location.TURTLE_POND],
+            "outdoor": [Location.ZILKER_PARK, Location.MT_BONNELL_AND_MAYFIELD_PARK, 
+                       Location.LADY_BIRD_JOHNSON_WILDFLOWER_CENTER],
+            "indoor": [Location.BLANTON_MUSEUM_OF_ART, Location.GATES_DELL_COMPLEX, 
+                      Location.TEXAS_MEMORIAL_MUSEUM],
+            "campus": [Location.FLAWN_ACADEMIC_CENTER, Location.GATES_DELL_COMPLEX, 
+                      Location.FINE_ARTS_LIBRARY],
+            "government": [Location.TEXAS_STATE_CAPITOL, Location.LBJ_LIBRARY_AND_MUSEUM],
         }
         
         category = most_common_category[0]

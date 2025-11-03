@@ -135,12 +135,12 @@ class MLDS0(Agent):
         # fmt: off
         prompt = [
             (LLMRole.SYSTEM, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
-            (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
-            (LLMRole.ASSISTANT, "Casino"),
-            (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
-            (LLMRole.ASSISTANT, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
-            (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
-            (LLMRole.ASSISTANT, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
+            (LLMRole.USER, f"Question: \"Do you see animals here?\" Answer: \"Yes, turtles and fish are common.\""),
+            (LLMRole.ASSISTANT, "Turtle Pond, Lake Austin"),
+            (LLMRole.USER, f"Question: \"Do people take photos here?\" Answer: \"Yes\""),
+            (LLMRole.ASSISTANT, "Blanton Museum of Art, UT Tower, Littlefield Fountain, Turtle Pond, Texas State Capitol, Mt. Bonnell & Mayfield Park, Texas Memorial Museum"),
+            (LLMRole.USER, f"Question: \"Is the architecture grande?\" Answer: \"Yes, it is impressive and historic.\""),
+            (LLMRole.ASSISTANT, "Texas State Capitol, UT Tower, Littlefield Fountain, Texas Memorial Museum"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
@@ -358,12 +358,12 @@ class MLDS1(Agent):
         # fmt: off
         prompt = [
             (LLMRole.SYSTEM, f"You are playing a game of spyfall. List of only the most reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
-            (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
-            (LLMRole.ASSISTANT, "Casino"),
-            (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
-            (LLMRole.ASSISTANT, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
-            (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
-            (LLMRole.ASSISTANT, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
+            (LLMRole.USER, f"Question: \"Do you see animals here?\" Answer: \"Yes, turtles and fish are common.\""),
+            (LLMRole.ASSISTANT, "Turtle Pond, Lake Austin"),
+            (LLMRole.USER, f"Question: \"Do people take photos here?\" Answer: \"Yes\""),
+            (LLMRole.ASSISTANT, "Blanton Museum of Art, UT Tower, Littlefield Fountain, Turtle Pond, Texas State Capitol, Mt. Bonnell & Mayfield Park, Texas Memorial Museum"),
+            (LLMRole.USER, f"Question: \"Is the architecture grande?\" Answer: \"Yes, it is impressive and historic.\""),
+            (LLMRole.ASSISTANT, "Texas State Capitol, UT Tower, Littlefield Fountain, Texas Memorial Museum"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
@@ -581,12 +581,12 @@ class MLDS2(Agent):
         # fmt: off
         prompt = [
             (LLMRole.SYSTEM, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
-            (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
-            (LLMRole.ASSISTANT, "Casino"),
-            (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
-            (LLMRole.ASSISTANT, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
-            (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
-            (LLMRole.ASSISTANT, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
+            (LLMRole.USER, f"Question: \"Do you see animals here?\" Answer: \"Yes, turtles and fish are common.\""),
+            (LLMRole.ASSISTANT, "Turtle Pond, Lake Austin"),
+            (LLMRole.USER, f"Question: \"Do people take photos here?\" Answer: \"Yes\""),
+            (LLMRole.ASSISTANT, "Blanton Museum of Art, UT Tower, Littlefield Fountain, Turtle Pond, Texas State Capitol, Mt. Bonnell & Mayfield Park, Texas Memorial Museum"),
+            (LLMRole.USER, f"Question: \"Is the architecture grande?\" Answer: \"Yes, it is impressive and historic.\""),
+            (LLMRole.ASSISTANT, "Texas State Capitol, UT Tower, Littlefield Fountain, Texas Memorial Museum"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
@@ -818,12 +818,12 @@ class NLPMeeting(Agent):
         # fmt: off
         prompt = [
             (LLMRole.SYSTEM, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
-            (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
-            (LLMRole.ASSISTANT, "Casino"),
-            (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
-            (LLMRole.ASSISTANT, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
-            (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
-            (LLMRole.ASSISTANT, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
+            (LLMRole.USER, f"Question: \"Do you see animals here?\" Answer: \"Yes, turtles and fish are common.\""),
+            (LLMRole.ASSISTANT, "Turtle Pond, Lake Austin"),
+            (LLMRole.USER, f"Question: \"Do people take photos here?\" Answer: \"Yes\""),
+            (LLMRole.ASSISTANT, "Blanton Museum of Art, UT Tower, Littlefield Fountain, Turtle Pond, Texas State Capitol, Mt. Bonnell & Mayfield Park, Texas Memorial Museum"),
+            (LLMRole.USER, f"Question: \"Is the architecture grande?\" Answer: \"Yes, it is impressive and historic.\""),
+            (LLMRole.ASSISTANT, "Texas State Capitol, UT Tower, Littlefield Fountain, Texas Memorial Museum"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
