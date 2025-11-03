@@ -1,16 +1,16 @@
-<img src="media/readme_image.jpg" alt="spyfall" width="250" align="right" style="padding: 50px;"/>
+<img src="media/readme_image.png" alt="spyfall" width="250" align="right" style="padding: 50px;"/>
 
-# Long Competition 2025: Spyfall
+# Long Competition Fall 2025: Spyfall - Double Cross
 
-This is the repository for the 2025 UT Austin MLDS Long Competition where teams will be competing in a game of Spyfall. Teams will submit agents that can use LLMs and embedding models to ask/answer questions and determine the spy/location. The goal of this Long Competition is to show your LLM prompting/natural language processing skills.
+This is the repository for the 2025 UT Austin MLDS Long Competition where teams will be competing in a game of Spyfall. Teams will submit agents that can use LLMs and embedding models to ask/answer questions and determine the spies/location. The goal of this Long Competition is to show your LLM prompting/natural language processing skills.
 
 ## Game Rules
 
-**<u>Setup</u>**: Each game is played with 4-12 players. All players are given the location except for the spy.
+**<u>Setup</u>**: Each game is played with 5-10 players. All players are given the location except for the spies. The spies do not know each other and are competing against each other.
 
-**<u>Spy Objective</u>**: The spy must figure out the location without revealing their identity.
+**<u>Spy Objective</u>**: The spies must figure out the location without revealing their identity.
 
-**<u>Non-Spy Objective</u>**: Players must figure out who the spy is.
+**<u>Non-Spy Objective</u>**: Players must figure out who one of the spies is.
 
 **<u>Gameplay</u>**: Each game consists of a fixed number of rounds. In each round, the following happens:
 
@@ -18,7 +18,7 @@ This is the repository for the 2025 UT Austin MLDS Long Competition where teams 
 
    Ex: A --> B --> A is not allowed.
 2. **<u>Questioning Analysis</u>**: All players are given time to analyze the question/answer.
-3. **<u>Guessing</u>**: The spy may guess the location. This will end the game.
+3. **<u>Guessing</u>**: The spies may guess the location. This will end the game. If both spies guess, the order is randomized.
 4. **<u>Accusation</u>**: Players may accuse another player of being the spy. Successfully indicting a player will end the game. For a player to be indicted, the following conditions must be met:
    * A majority of the players must accuse *any* player.
    * One player must get a plurality of the votes. If a tie occurs, nothing happens.
@@ -29,15 +29,20 @@ This is the repository for the 2025 UT Austin MLDS Long Competition where teams 
 
 **<u>The game ends when</u>**:
 
-* The spy guesses the location.
-* A player is indicted of being the spy.
+* A spy guesses the location.
+* A player is indicted of being a spy.
 * All rounds are completed.
 
 **<u>Scoring</u>**:
 
-# TODO fixme: scoring details
-* **<u>Spy Victory</u>**: The spy earns 2 points if no one is indicted of being the spy, 4 points if a non-spy player is indicted of being the spy, and 4 points if the spy stops the game and successfully guesses the location.
-* **<u>Non-Spy Victory</u>**: Each non-spy player earns 1 point.
+| Event                     | Points                        |
+| ------------------------- | ----------------------------- |
+| No guesses or indictments | 2 to each spy                 |
+| Spy guesses correctly     | 4 to that spy                 |
+| Spy guesses incorrectly   | 1 to all others               |
+| Spy indicted              | 1 to nonspies, 4 to other spy |
+| Non-spy indicted          | 3 to each spy                 |
+
 
 ## Getting Started
 
