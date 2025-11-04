@@ -2,9 +2,9 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import final
 
-from data import Location, redaction_dict
+from data import Location
 from nlp import LLMRole, NLPProxy
-from util import redact, relative_path_decorator
+from util import relative_path_decorator
 
 # This file explains what each method in the Agent class should do ######################
 

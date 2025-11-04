@@ -118,7 +118,7 @@ class Game:
 
         for i, player_class_name in enumerate(player_names):
             player_class = AGENT_REGISTRY[player_class_name]
-            player_nlp = TokenCounterWrapper(nlp)
+            player_nlp = TokenCounterWrapper(nlp, player_name=player_class_name)
             given_location = self.location if i not in self.spies else None
             player_instance = player_class(
                 given_location, n_players, n_rounds, nlp=NLPProxy(player_nlp)
@@ -205,13 +205,8 @@ class Game:
 
         # Calculate percent right votes for each spy
         percent_right_votes = np.zeros(self.n_players)
-        for i in range(self.n_players):
-            if i not in self.spies:
-                # For non-spies, calculate how often they voted for a spy
-                spy_votes = np.sum(votes == spy for spy in self.spies)
-                percent_right_votes[i] = np.mean(spy_votes, axis=0)
-            else:
-                percent_right_votes[i] = np.nan
+        for i in self.spies:
+            percent_right_votes += np.mean(votes == i, axis=0)
         series = pd.Series(data=percent_right_votes, index=self.player_names)
         series = series.groupby(series.index).mean()
         return series

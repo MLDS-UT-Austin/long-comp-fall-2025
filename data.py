@@ -33,6 +33,7 @@ class Location(Enum):
     SOUTH_CONGRESS_SOCO = "South Congress (SoCo)"
 
 
+<<<<<<< HEAD
 # A dictionary that can optionally be used by agents to redact LLM output based on the location
 # fmt: off
 redaction_dict = {
@@ -66,6 +67,8 @@ redaction_dict = {
 
 # fmt: on
 
+=======
+>>>>>>> origin/main
 # Everthing below is for internal use to generate the game dialogue #####################################
 
 SPY_REVEAL_AND_GUESS = (

@@ -19,24 +19,7 @@ from parselmouth.praat import call
 
 from data import *
 
-# Feel free to use redact() in your agent:
-
-
-def redact(text: str, location: Location, redacted_text: str = "<REDACTED>") -> str:
-    """Can optionally by used by agents to redact text based on the location
-    This can be useful to prevent the LLM from giving away the location
-    Note: this is not called in game.py
-    Args:
-        text (str): text to redact
-        location (Location): the location to redact
-        redacted_text (str, optional): what to replace the redacted text with
-    """
-    for word in redaction_dict[location]:
-        text = re.sub(rf"{word}", redacted_text, text, flags=re.IGNORECASE)
-    return text
-
-
-# Everything below is for internal use ###############################################
+# Everything here is for internal use ###############################################
 
 
 def count_votes(votes: list[int | None], n_players: int) -> int | None:
@@ -105,7 +88,7 @@ def sample_agents(
         # Randomly assign two agents as spies, ensuring fairness
         spy_indices = random.sample(range(team_size), 2)
         spy_names = [game_agents[i] for i in spy_indices]
-        
+
         for spy_name in spy_names:
             spy_count[spy_name] += 1
         game_agents_count["".join(sorted(game_agents))] += 1
@@ -171,38 +154,6 @@ def relative_path_decorator(cls):
             setattr(cls, attr_name, wrapped_method)
 
     return cls
-
-
-def rate_limit(requests_per_second: int):
-    """A decorator to rate limit a function to a certain number of requests per second
-    Args:
-        requests_per_second (int): the number of requests per second
-    """
-
-    def decorator(func):
-        last_time = 0
-        request_lock = asyncio.Lock()
-
-        @wraps(func)
-        async def wrapper(*args, **kwargs):
-            async with request_lock:
-                nonlocal last_time
-                await asyncio.sleep(
-                    last_time + (1 / requests_per_second) - time.monotonic()
-                )
-                last_time = time.monotonic()
-            while True:
-                wait_time = 0.1
-                try:
-                    return await func(*args, **kwargs)
-                except:
-                    # exponential backoff
-                    await asyncio.sleep(wait_time)
-                    wait_time *= 1.2
-
-        return wrapper
-
-    return decorator
 
 
 VOICES = [

@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # Run a single game ####################################################
     # Feel free to edit the players, duplicate players are allowed
     game = Game(
-        player_names=["Team Name Here", "MLDS 0", "MLDS 1", "MLDS 2"],
+        player_names=["Team Name Here", "MLDS 0", "MLDS 1", "MLDS 2", "NLP Meeting", "Pattern Matcher"],
         nlp=nlp,
         n_rounds=20,
     )
@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     # Run multiple games with randomly sampled agents ####################################################
     sim = Simulation(
-        nlp, agent_names=["Team Name Here", "MLDS 0", "MLDS 1", "MLDS 2"], team_size=6
+        nlp, agent_names=["Team Name Here", "MLDS 0", "MLDS 1", "MLDS 2", "NLP Meeting", "Pattern Matcher"], team_size=6
     )
     sim.validate_agents()
     sim.run(n_games=10)
