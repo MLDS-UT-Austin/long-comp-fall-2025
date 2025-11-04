@@ -133,13 +133,13 @@ class MLDS0(Agent):
     ) -> None:
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
-            (LLMRole.USER, f"Question: \"Do you see animals here?\" Answer: \"Yes, turtles and fish are common.\""),
-            (LLMRole.ASSISTANT, "Turtle Pond, Lake Austin"),
-            (LLMRole.USER, f"Question: \"Do people take photos here?\" Answer: \"Yes\""),
-            (LLMRole.ASSISTANT, "Blanton Museum of Art, UT Tower, Littlefield Fountain, Turtle Pond, Texas State Capitol, Mt. Bonnell & Mayfield Park, Texas Memorial Museum"),
-            (LLMRole.USER, f"Question: \"Is the architecture grande?\" Answer: \"Yes, it is impressive and historic.\""),
-            (LLMRole.ASSISTANT, "Texas State Capitol, UT Tower, Littlefield Fountain, Texas Memorial Museum"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
+            (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
+            (LLMRole.MODEL, "Casino"),
+            (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
+            (LLMRole.MODEL, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
+            (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
+            (LLMRole.MODEL, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
@@ -356,13 +356,13 @@ class MLDS1(Agent):
     ) -> None:
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. List of only the most reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
-            (LLMRole.USER, f"Question: \"Do you see animals here?\" Answer: \"Yes, turtles and fish are common.\""),
-            (LLMRole.ASSISTANT, "Turtle Pond, Lake Austin"),
-            (LLMRole.USER, f"Question: \"Do people take photos here?\" Answer: \"Yes\""),
-            (LLMRole.ASSISTANT, "Blanton Museum of Art, UT Tower, Littlefield Fountain, Turtle Pond, Texas State Capitol, Mt. Bonnell & Mayfield Park, Texas Memorial Museum"),
-            (LLMRole.USER, f"Question: \"Is the architecture grande?\" Answer: \"Yes, it is impressive and historic.\""),
-            (LLMRole.ASSISTANT, "Texas State Capitol, UT Tower, Littlefield Fountain, Texas Memorial Museum"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. List of only the most reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
+            (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
+            (LLMRole.MODEL, "Casino"),
+            (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
+            (LLMRole.MODEL, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
+            (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
+            (LLMRole.MODEL, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
@@ -579,13 +579,13 @@ class MLDS2(Agent):
     ) -> None:
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
-            (LLMRole.USER, f"Question: \"Do you see animals here?\" Answer: \"Yes, turtles and fish are common.\""),
-            (LLMRole.ASSISTANT, "Turtle Pond, Lake Austin"),
-            (LLMRole.USER, f"Question: \"Do people take photos here?\" Answer: \"Yes\""),
-            (LLMRole.ASSISTANT, "Blanton Museum of Art, UT Tower, Littlefield Fountain, Turtle Pond, Texas State Capitol, Mt. Bonnell & Mayfield Park, Texas Memorial Museum"),
-            (LLMRole.USER, f"Question: \"Is the architecture grande?\" Answer: \"Yes, it is impressive and historic.\""),
-            (LLMRole.ASSISTANT, "Texas State Capitol, UT Tower, Littlefield Fountain, Texas Memorial Museum"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. Your response is being parsed by code, so respond like a robot. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
+            (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
+            (LLMRole.MODEL, "Casino"),
+            (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
+            (LLMRole.MODEL, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
+            (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
+            (LLMRole.MODEL, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
@@ -716,23 +716,10 @@ class NLPMeeting(Agent):
         # nonspy data
         self.avg_spy_score = np.zeros(n_players - 1, dtype=float)
 
-        # Generate embeddings of the question/answer bank
-        import os
-        self.embedding = GeminiEmbedding()
-        csv_path = os.path.join(os.path.dirname(__file__), "all_question_bank.csv")
-        self.question_data = pd.read_csv(csv_path)
-        # Create embeddings for all questions
-        
-        self.question_data["question_embedding"] = self.question_data["question"].apply(
-            lambda x: asyncio.get_event_loop().run_until_complete(self.embedding.get_embeddings(x))
-        )
-        self.question_data["answer_embedding"] = self.question_data["answer"].apply(
-            lambda x: asyncio.get_event_loop().run_until_complete(self.embedding.get_embeddings(x))
-        )
-        pkl_path = os.path.join(os.path.dirname(__file__), "question_data_with_embeddings.pkl")
-        self.question_data.to_pickle(pkl_path)
-        # pkl_path = os.path.join(os.path.dirname(__file__), "question_data_with_embeddings.pkl")
-        # self.question_data = pd.read_pickle(pkl_path)
+        assert os.path.exists(
+            "question_data_with_embeddings.pkl"
+        ), "Please run generate_embeddings.py to generate question_data_with_embeddings.pkl"
+        self.question_data = pd.read_pickle("question_data_with_embeddings.pkl")
 
         # keeping track of location probability
         self.locs_prob = np.array([0 for loc in Location])
@@ -819,13 +806,13 @@ class NLPMeeting(Agent):
     ) -> None:
         # fmt: off
         prompt = [
-            (LLMRole.SYSTEM, f"You are playing a game of spyfall. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
-            (LLMRole.USER, f"Question: \"Do you see animals here?\" Answer: \"Yes, turtles and fish are common.\""),
-            (LLMRole.ASSISTANT, "Turtle Pond, Lake Austin"),
-            (LLMRole.USER, f"Question: \"Do people take photos here?\" Answer: \"Yes\""),
-            (LLMRole.ASSISTANT, "Blanton Museum of Art, UT Tower, Littlefield Fountain, Turtle Pond, Texas State Capitol, Mt. Bonnell & Mayfield Park, Texas Memorial Museum"),
-            (LLMRole.USER, f"Question: \"Is the architecture grande?\" Answer: \"Yes, it is impressive and historic.\""),
-            (LLMRole.ASSISTANT, "Texas State Capitol, UT Tower, Littlefield Fountain, Texas Memorial Museum"),
+            (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
+            (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
+            (LLMRole.MODEL, "Casino"),
+            (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
+            (LLMRole.MODEL, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
+            (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
+            (LLMRole.MODEL, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
