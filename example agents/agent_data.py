@@ -16,9 +16,9 @@ QUESTIONS = [
 
 # Examples answers for the question: "How often do you come here?"
 EXAMPLE_ANSWER = {
-    Location.BLANTON_MUSEUM_OF_ART: "A few times a year",
+    Location.BLANTON_MUSEUM: "A few times a year",
     Location.HARRY_RANSOM_CENTER: "A few times a year",
-    Location.LBJ_LIBRARY_AND_MUSEUM: "A few times a year",
+    Location.LBJ_LIBRARY: "A few times a year",
     Location.FLAWN_ACADEMIC_CENTER: "Every day",
     Location.ART_BUILDING_AND_MUSEUM: "Every day",
     Location.GATES_DELL_COMPLEX: "Every day",
@@ -34,20 +34,20 @@ EXAMPLE_ANSWER = {
     Location.NORMAN_HACKERMAN_BUILDING: "Every day",
     Location.WCP_STUDENT_ACTIVITY_CENTER: "Every day",
     Location.TEXAS_STATE_CAPITOL: "A few times a year",
-    Location.MT_BONNELL_AND_MAYFIELD_PARK: "Every once in a while",
+    Location.MOUNT_BONNELL_AND_MAYFIELD_PARK: "Every once in a while",
     Location.BARTON_SPRINGS: "Every once in a while",
     Location.ZILKER_PARK: "Every week",
     Location.LAKE_AUSTIN: "Every once in a while",
     Location.LADY_BIRD_JOHNSON_WILDFLOWER_CENTER: "A few times a year",
     Location.ZILKER_BOTANICAL_GARDEN: "A few times a year",
     Location.CONGRESS_AVENUE_BRIDGE: "A few times a week",
-    Location.SOUTH_CONGRESS_SOCO: "A few times a month",
+    Location.SOUTH_CONGRESS: "A few times a month",
 }
 
 EXAMPLE_BAD_ANSWER = {
-    Location.BLANTON_MUSEUM_OF_ART: "Every day",
+    Location.BLANTON_MUSEUM: "Every day",
     Location.HARRY_RANSOM_CENTER: "Every day",
-    Location.LBJ_LIBRARY_AND_MUSEUM: "Every day",
+    Location.LBJ_LIBRARY: "Every day",
     Location.FLAWN_ACADEMIC_CENTER: "Never",
     Location.ART_BUILDING_AND_MUSEUM: "Never",
     Location.GATES_DELL_COMPLEX: "Never",
@@ -63,12 +63,12 @@ EXAMPLE_BAD_ANSWER = {
     Location.NORMAN_HACKERMAN_BUILDING: "Never",
     Location.WCP_STUDENT_ACTIVITY_CENTER: "Never",
     Location.TEXAS_STATE_CAPITOL: "Every day",
-    Location.MT_BONNELL_AND_MAYFIELD_PARK: "Every day",
+    Location.MOUNT_BONNELL_AND_MAYFIELD_PARK: "Every day",
     Location.BARTON_SPRINGS: "Every day",
     Location.ZILKER_PARK: "Never",
     Location.LAKE_AUSTIN: "Every day",
     Location.LADY_BIRD_JOHNSON_WILDFLOWER_CENTER: "Every day",
     Location.ZILKER_BOTANICAL_GARDEN: "Every day",
     Location.CONGRESS_AVENUE_BRIDGE: "Never",
-    Location.SOUTH_CONGRESS_SOCO: "Every day",
+    Location.SOUTH_CONGRESS: "Every day",
 }

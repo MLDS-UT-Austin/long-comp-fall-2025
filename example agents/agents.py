@@ -134,12 +134,12 @@ class MLDS0(Agent):
         # fmt: off
         prompt = [
             (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
-            (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
-            (LLMRole.MODEL, "Casino"),
-            (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
-            (LLMRole.MODEL, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
-            (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
-            (LLMRole.MODEL, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
+            (LLMRole.USER, f"Question: \"What type of animals would you see here?\" Answer: \"Probably some green-shelled ones\""),
+            (LLMRole.MODEL, "Turtle Pond"),
+            (LLMRole.USER, f"Question: \"Would you go here to relax?\" Answer: \"Yes\""),
+            (LLMRole.MODEL, "Turtle Pond, Mount Bonnell & Mayfield Park, Barton Springs, Zilker Park, Lake Austin"),
+            (LLMRole.USER, f"Question: \"Is this a good place to study?\" Answer: \"Yes\""),
+            (LLMRole.MODEL, "Flawn Academic Center, Gates Dell Complex, Fine Arts Library, UT Tower, Norman Hackerman Building, WCP Student Activity Center"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
@@ -357,12 +357,12 @@ class MLDS1(Agent):
         # fmt: off
         prompt = [
             (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. List of only the most reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
-            (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
-            (LLMRole.MODEL, "Casino"),
-            (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
-            (LLMRole.MODEL, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
-            (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
-            (LLMRole.MODEL, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
+            (LLMRole.USER, f"Question: \"What type of animals would you see here?\" Answer: \"Probably some green-shelled ones\""),
+            (LLMRole.MODEL, "Turtle Pond"),
+            (LLMRole.USER, f"Question: \"Would you go here to relax?\" Answer: \"Yes\""),
+            (LLMRole.MODEL, "Turtle Pond, Mount Bonnell & Mayfield Park, Barton Springs, Zilker Park, Lake Austin"),
+            (LLMRole.USER, f"Question: \"Is this a good place to study?\" Answer: \"Yes\""),
+            (LLMRole.MODEL, "Flawn Academic Center, Gates Dell Complex, Fine Arts Library, UT Tower, Norman Hackerman Building, WCP Student Activity Center"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
@@ -580,12 +580,12 @@ class MLDS2(Agent):
         # fmt: off
         prompt = [
             (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. Your response is being parsed by code, so respond like a robot. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
-            (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
-            (LLMRole.MODEL, "Casino"),
-            (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
-            (LLMRole.MODEL, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
-            (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
-            (LLMRole.MODEL, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
+            (LLMRole.USER, f"Question: \"What type of animals would you see here?\" Answer: \"Probably some green-shelled ones\""),
+            (LLMRole.MODEL, "Turtle Pond"),
+            (LLMRole.USER, f"Question: \"Would you go here to relax?\" Answer: \"Yes\""),
+            (LLMRole.MODEL, "Turtle Pond, Mount Bonnell & Mayfield Park, Barton Springs, Zilker Park, Lake Austin"),
+            (LLMRole.USER, f"Question: \"Is this a good place to study?\" Answer: \"Yes\""),
+            (LLMRole.MODEL, "Flawn Academic Center, Gates Dell Complex, Fine Arts Library, UT Tower, Norman Hackerman Building, WCP Student Activity Center"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
@@ -807,12 +807,12 @@ class NLPMeeting(Agent):
         # fmt: off
         prompt = [
             (LLMRole.USER, f"You are playing a game of spyfall. Your response is being parsed by code, so respond like a robot. List of ALL reasonable locations for each question and answer. Possible locations: {', '.join([i.value for i in Location])}"),
-            (LLMRole.USER, f"Question: \"How much would you gamble at this location\" Answer: \"Hopefully not too much\""),
-            (LLMRole.MODEL, "Casino"),
-            (LLMRole.USER, f"Question: \"Have you been to this location before?\" Answer: \"No\""),
-            (LLMRole.MODEL, "Corporate Party, Crusader Army, Embassy, Ocean Liner, Pirate Ship, Polar Station, Space Station, Submarine"),
-            (LLMRole.USER, f"Question: \"How far is this location from the nearest public transportation?\" Answer: \"Very very far\""),
-            (LLMRole.MODEL, "Airplane, Crusader Army, Ocean Liner, Space Station, Submarine, Pirate Ship, Polar Station"),
+            (LLMRole.USER, f"Question: \"What type of animals would you see here?\" Answer: \"Probably some green-shelled ones\""),
+            (LLMRole.MODEL, "Turtle Pond"),
+            (LLMRole.USER, f"Question: \"Would you go here to relax?\" Answer: \"Yes\""),
+            (LLMRole.MODEL, "Turtle Pond, Mount Bonnell & Mayfield Park, Barton Springs, Zilker Park, Lake Austin"),
+            (LLMRole.USER, f"Question: \"Is this a good place to study?\" Answer: \"Yes\""),
+            (LLMRole.MODEL, "Flawn Academic Center, Gates Dell Complex, Fine Arts Library, UT Tower, Norman Hackerman Building, WCP Student Activity Center"),
             (LLMRole.USER, f"Question: \"{question}\" Answer: \"{answer}\""),
         ]
         # fmt: on
@@ -975,20 +975,15 @@ class PatternMatcher(Agent):
                 "It's nice when the conditions are right.",
                 "Being outside is part of the appeal.",
             ],
-            "transport": [
-                "You need to get from one place to another.",
-                "It's about the journey, really.",
-                "Timing is important here.",
+            "museum": [
+                "The exhibits are quite interesting.",
+                "People often spend hours exploring.",
+                "It's a place to learn and reflect.",
             ],
-            "service": [
-                "People come here for a specific purpose.",
-                "The staff are usually helpful.",
-                "It serves an important function.",
-            ],
-            "entertainment": [
-                "People come here to enjoy themselves.",
-                "It's a popular destination.",
-                "The experience varies each time.",
+            "landmark": [
+                "It's a well-known spot.",
+                "Many people visit to see it.",
+                "It's iconic in its own way.",
             ],
         }
 
@@ -1068,43 +1063,48 @@ class PatternMatcher(Agent):
 
         # Categorize locations
         indoor_locations = [
-            "BANK",
-            "CASINO",
-            "CATHEDRAL",
-            "HOSPITAL",
-            "HOTEL",
-            "RESTAURANT",
-            "SCHOOL",
-            "SUPERMARKET",
+            Location.FLAWN_ACADEMIC_CENTER,
+            Location.GATES_DELL_COMPLEX,
+            Location.FINE_ARTS_LIBRARY,
+            Location.GREGORY_GYM,
+            Location.NORMAN_HACKERMAN_BUILDING,
+            Location.WCP_STUDENT_ACTIVITY_CENTER,
         ]
-        outdoor_locations = ["BEACH", "CIRCUS_TENT", "MILITARY_BASE", "POLAR_STATION"]
-        transport_locations = [
-            "AIRPLANE",
-            "OCEAN_LINER",
-            "PASSENGER_TRAIN",
-            "PIRATE_SHIP",
-            "SPACE_STATION",
-            "SUBMARINE",
+        outdoor_locations = [
+            Location.DARRELL_K_ROYAL_TEXAS_MEMORIAL_STADIUM,
+            Location.MOUNT_BONNELL_AND_MAYFIELD_PARK,
+            Location.ZILKER_PARK,
+            Location.LAKE_AUSTIN,
+            Location.BARTON_SPRINGS,
+            Location.LITTLEFIELD_FOUNTAIN,
+            Location.TURTLE_POND,
+            Location.THE_DRAG,
+            Location.LADY_BIRD_JOHNSON_WILDFLOWER_CENTER,
+            Location.ZILKER_BOTANICAL_GARDEN,
+            Location.SOUTH_CONGRESS,
         ]
-        service_locations = ["DAY_SPA", "EMBASSY", "POLICE_STATION", "SERVICE_STATION"]
-        entertainment_locations = [
-            "BROADWAY_THEATER",
-            "CORPORATE_PARTY",
-            "MOVIE_STUDIO",
+        museum_locations = [
+            Location.CHRISTIAN_GREEN_GALLERY,
+            Location.BLANTON_MUSEUM,
+            Location.HARRY_RANSOM_CENTER,
+            Location.LBJ_LIBRARY,
+            Location.ART_BUILDING_AND_MUSEUM,
+            Location.TEXAS_MEMORIAL_MUSEUM,
+        ]
+        landmark_locations = [
+            Location.UT_TOWER,
+            Location.CONGRESS_AVENUE_BRIDGE,
+            Location.TEXAS_STATE_CAPITOL,
         ]
 
-        location_name = self.location.name
-
-        if location_name in indoor_locations:
+        if self.location in indoor_locations:
             return random.choice(self.location_answers["indoor"])
-        elif location_name in outdoor_locations:
+        elif self.location in outdoor_locations:
             return random.choice(self.location_answers["outdoor"])
-        elif location_name in transport_locations:
-            return random.choice(self.location_answers["transport"])
-        elif location_name in service_locations:
-            return random.choice(self.location_answers["service"])
-        elif location_name in entertainment_locations:
-            return random.choice(self.location_answers["entertainment"])
+        elif self.location in museum_locations:
+            return random.choice(self.location_answers["museum"])
+        elif self.location in landmark_locations:
+            return random.choice(self.location_answers["landmark"])
         else:
             return "It serves its purpose well."
 
@@ -1233,14 +1233,22 @@ class PatternMatcher(Agent):
             return None
 
         # Map categories to likely locations (simplified)
+        location_hints = {
+            "indoor": ["inside", "building", "room", "floor", "ceiling"],
+            "outdoor": ["outside", "weather", "sky", "sun", "air"],
+            "water": ["water", "ocean", "sea", "boat", "ship"],
+            "transport": ["travel", "journey", "destination", "arrive"],
+            "service": ["help", "service", "staff", "customer"],
+        }
         category_to_locations = {
-            "water": [Location.OCEAN_LINER, Location.PIRATE_SHIP, Location.SUBMARINE],
-            "transport": [
-                Location.AIRPLANE,
-                Location.PASSENGER_TRAIN,
-                Location.SPACE_STATION,
+            "water": [
+                Location.TURTLE_POND,
+                Location.LITTLEFIELD_FOUNTAIN,
+                Location.BARTON_SPRINGS,
+                Location.LAKE_AUSTIN,
             ],
-            "service": [Location.HOSPITAL, Location.POLICE_STATION, Location.DAY_SPA],
+            "transport": [Location.SOUTH_CONGRESS, Location.ZILKER_BOTANICAL_GARDEN, Location.LADY_BIRD_JOHNSON_WILDFLOWER_CENTER, Location.MOUNT_BONNELL_AND_MAYFIELD_PARK, Location.TEXAS_STATE_CAPITOL],
+            "service": [Location.SOUTH_CONGRESS, Location.THE_DRAG],
         }
 
         category = most_common_category[0]

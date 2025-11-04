@@ -5,13 +5,13 @@ from enum import Enum
 
 # All possible locations in the game
 class Location(Enum):
-    BLANTON_MUSEUM_OF_ART = "Blanton Museum of Art"
+    BLANTON_MUSEUM = "Blanton Museum"
     HARRY_RANSOM_CENTER = "Harry Ransom Center"
-    LBJ_LIBRARY_AND_MUSEUM = "LBJ Library & Museum"
+    LBJ_LIBRARY = "LBJ Library"
     FLAWN_ACADEMIC_CENTER = "Flawn Academic Center"
     ART_BUILDING_AND_MUSEUM = "Art Building and Museum"
     GATES_DELL_COMPLEX = "Gates Dell Complex"
-    CHRISTIAN_GREEN_GALLERY = "Christian-Green Gallery"
+    CHRISTIAN_GREEN_GALLERY = "Christian Green Gallery"
     FINE_ARTS_LIBRARY = "Fine Arts Library"
     DARRELL_K_ROYAL_TEXAS_MEMORIAL_STADIUM = "Darrell K Royal Texas Memorial Stadium"
     GREGORY_GYM = "Gregory Gym"
@@ -23,23 +23,22 @@ class Location(Enum):
     NORMAN_HACKERMAN_BUILDING = "Norman Hackerman Building"
     WCP_STUDENT_ACTIVITY_CENTER = "WCP Student Activity Center"
     TEXAS_STATE_CAPITOL = "Texas State Capitol"
-    MT_BONNELL_AND_MAYFIELD_PARK = "Mt. Bonnell & Mayfield Park"
+    MOUNT_BONNELL_AND_MAYFIELD_PARK = "Mount Bonnell & Mayfield Park"
     BARTON_SPRINGS = "Barton Springs"
     ZILKER_PARK = "Zilker Park"
     LAKE_AUSTIN = "Lake Austin"
     LADY_BIRD_JOHNSON_WILDFLOWER_CENTER = "Lady Bird Johnson Wildflower Center"
     ZILKER_BOTANICAL_GARDEN = "Zilker Botanical Garden"
     CONGRESS_AVENUE_BRIDGE = "Congress Avenue Bridge"
-    SOUTH_CONGRESS_SOCO = "South Congress (SoCo)"
+    SOUTH_CONGRESS = "South Congress"
 
 
-<<<<<<< HEAD
 # A dictionary that can optionally be used by agents to redact LLM output based on the location
 # fmt: off
 redaction_dict = {
-    Location.BLANTON_MUSEUM_OF_ART: ["blanton", "museum", "art", "gallery", "exhibit", "painting", "curator"],
+    Location.BLANTON_MUSEUM: ["blanton", "museum", "art", "gallery", "exhibit", "painting", "curator"],
     Location.HARRY_RANSOM_CENTER: ["ransom center", "harry ransom", "archive", "manuscript", "collection", "literature", "photography"],
-    Location.LBJ_LIBRARY_AND_MUSEUM: ["lbj", "library", "museum", "presidential", "johnson", "exhibit", "archives"],
+    Location.LBJ_LIBRARY: ["lbj", "library", "museum", "presidential", "johnson", "exhibit", "archives"],
     Location.FLAWN_ACADEMIC_CENTER: ["flawn", "academic center", "study room", "tutoring", "library", "student"],
     Location.ART_BUILDING_AND_MUSEUM: ["art building", "museum", "studio", "exhibit", "painting", "sculpture"],
     Location.GATES_DELL_COMPLEX: ["gates dell complex", "gdc", "computer science", "programming", "lab", "coding", "engineering"],
@@ -55,20 +54,18 @@ redaction_dict = {
     Location.NORMAN_HACKERMAN_BUILDING: ["norman hackerman building", "nhb", "chemistry", "research", "lab", "science", "lecture"],
     Location.WCP_STUDENT_ACTIVITY_CENTER: ["wcp", "student activity center", "union", "study", "event", "meeting", "food court"],
     Location.TEXAS_STATE_CAPITOL: ["texas state capitol", "capitol", "government", "legislature", "governor", "building", "austin landmark"],
-    Location.MT_BONNELL_AND_MAYFIELD_PARK: ["mt bonnell", "mayfield park", "peacock", "hike", "viewpoint", "scenic", "trail"],
+    Location.MOUNT_BONNELL_AND_MAYFIELD_PARK: ["mt bonnell", "mayfield park", "peacock", "hike", "viewpoint", "scenic", "trail"],
     Location.BARTON_SPRINGS: ["barton springs", "pool", "spring", "swim", "bathing", "cold water", "zilker"],
     Location.ZILKER_PARK: ["zilker park", "zilker", "park", "picnic", "festival", "trail", "outdoors"],
     Location.LAKE_AUSTIN: ["lake austin", "lake", "boat", "kayak", "water", "dock", "scenic"],
     Location.LADY_BIRD_JOHNSON_WILDFLOWER_CENTER: ["wildflower center", "lady bird johnson", "wildflower", "garden", "native plants", "botanical"],
     Location.ZILKER_BOTANICAL_GARDEN: ["zilker botanical garden", "botanical", "garden", "plants", "flowers", "greenhouse", "pond"],
     Location.CONGRESS_AVENUE_BRIDGE: ["congress avenue bridge", "bridge", "bats", "downtown", "austin skyline", "river"],
-    Location.SOUTH_CONGRESS_SOCO: ["south congress", "soco", "shopping", "restaurants", "street", "murals", "austin"],
+    Location.SOUTH_CONGRESS: ["south congress", "soco", "shopping", "restaurants", "street", "murals", "austin"],
 }
 
 # fmt: on
 
-=======
->>>>>>> origin/main
 # Everthing below is for internal use to generate the game dialogue #####################################
 
 SPY_REVEAL_AND_GUESS = (
