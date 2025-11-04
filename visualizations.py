@@ -115,7 +115,7 @@ class Visualization:
 
 
 if __name__ == "__main__":
-    vis = Visualization(["Player 1", "Player 2", "Player 3", "Player 4"], [0, 2], "Beach")
+    vis = Visualization(["Player 1", "Player 2", "Player 3", "Player 4"], [0, 2], "Blanton Museum")
     while True:
         for i in range(4):
             vis.render_text(i, "This is too long to fit on one line. " * 20)

@@ -16,7 +16,7 @@ from util import *
 class TestGame(unittest.IsolatedAsyncioTestCase):
 
     @patch("game.AGENT_REGISTRY", {f"Agent{i}": MyAgent for i in range(10)})
-    @patch("game.random.choice", lambda x: Location.BEACH)
+    @patch("game.random.choice", lambda x: Location.LBJ_LIBRARY)
     @patch("game.random.sample", lambda x, y: [0, 1])
     @patch("game.random.randint", lambda x, y: 0)
     async def asyncSetUp(self):
@@ -27,7 +27,7 @@ class TestGame(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.game.n_players, 10)
         self.assertEqual(self.game.player_names, self.player_names)
         self.assertEqual(self.game.n_rounds, 20)
-        self.assertEqual(self.game.location, Location.BEACH)
+        self.assertEqual(self.game.location, Location.LBJ_LIBRARY)
         self.assertEqual(self.game.spies, [0, 1])
         self.assertEqual(self.game.questioner, 0)
         self.assertEqual(len(self.game.players), 10)
@@ -37,7 +37,7 @@ class TestGame(unittest.IsolatedAsyncioTestCase):
 
     async def test_scoring(self):
         self.game.players[0].guess_location = AsyncMock()
-        self.game.players[0].guess_location.return_value = Location.BEACH
+        self.game.players[0].guess_location.return_value = Location.LBJ_LIBRARY
         await self.game.play_()
         self.assertEqual(self.game.game_state, GameState.SPY1_GUESSED_RIGHT)
         target_scores = pd.Series(index=self.player_names, data=[0.0] * 10)
@@ -69,7 +69,7 @@ class TestGame(unittest.IsolatedAsyncioTestCase):
 
 class TestRound(unittest.IsolatedAsyncioTestCase):
     @patch("game.AGENT_REGISTRY", {f"Agent{i}": MyAgent for i in range(3)})
-    @patch("game.random.choice", lambda x: Location.BEACH)
+    @patch("game.random.choice", lambda x: Location.LBJ_LIBRARY)
     @patch("game.random.sample", lambda x, y: [0, 1])
     @patch("game.random.randint", lambda x, y: 0)
     async def asyncSetUp(self):
@@ -139,7 +139,7 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
         p[0].ask_question.return_value = (1, "Question0")
         answerer0 = reverse_pov(1, pov=0)
         p[answerer0].answer_question.return_value = "Answer0"
-        p[0].guess_location.return_value = Location.BEACH
+        p[0].guess_location.return_value = Location.LBJ_LIBRARY
         p[1].guess_location.return_value = None
         p[0].accuse_player.return_value = None
         p[1].accuse_player.return_value = add_pov(0, 1)
@@ -152,7 +152,7 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.round.question, "Question0")
         self.assertEqual(self.round.answerer, answerer0)
         self.assertEqual(self.round.answer, "Answer0")
-        self.assertEqual(self.round.spy_guess, Location.BEACH)
+        self.assertEqual(self.round.spy_guess, Location.LBJ_LIBRARY)
         self.assertFalse(hasattr(self.round, "player_votes"))
         self.assertFalse(hasattr(self.round, "indicted"))
 
@@ -182,7 +182,7 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
         p[0].ask_question.return_value = (1, "Question0")
         answerer0 = reverse_pov(1, pov=0)
         p[answerer0].answer_question.return_value = "Answer0"
-        p[0].guess_location.return_value = Location.AIRPLANE
+        p[0].guess_location.return_value = Location.BLANTON_MUSEUM
         p[1].guess_location.return_value = None
         p[0].accuse_player.return_value = None
         p[1].accuse_player.return_value = add_pov(0, 1)
@@ -195,7 +195,7 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.round.question, "Question0")
         self.assertEqual(self.round.answerer, answerer0)
         self.assertEqual(self.round.answer, "Answer0")
-        self.assertEqual(self.round.spy_guess, Location.AIRPLANE)
+        self.assertEqual(self.round.spy_guess, Location.BLANTON_MUSEUM)
         self.assertFalse(hasattr(self.round, "player_votes"))
         self.assertFalse(hasattr(self.round, "indicted"))
 
