@@ -1,29 +1,46 @@
+import warnings
+
+warnings.filterwarnings(
+    "ignore", category=FutureWarning, module="google.api_core._python_version_support"
+)
+warnings.filterwarnings(
+    "ignore",
+    message="This feature is deprecated as of June 24, 2025",
+    category=UserWarning,
+    module=r"vertexai\.generative_models\._generative_models",
+)
+
+warnings.filterwarnings(
+    "ignore",
+    message="This feature is deprecated as of June 24, 2025",
+    category=UserWarning,
+    module=r"vertexai\._model_garden\._model_garden_models",
+)
+
 import asyncio
 import math
-import os
-import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
 
 import numpy as np
-import torch
-from dotenv import load_dotenv
-from together import AsyncTogether  # type: ignore
-from transformers import (  # type: ignore
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-)
+from google import genai
+from google.genai.types import Content, GenerateContentConfig, Part, ThinkingConfig
 
-from util import rate_limit
+
+# Set this to True to print out all LLM calls for debugging
+LLM_VERBOSE = False
+
+# Adjust these as needed if you want to change your GC project or location
+GOOGLE_CLOUD_PROJECT = "long-comp-fall-2025"
+GOOGLE_CLOUD_LOCATION = "us-central1"
 
 # This file explains how LLMRole and NLPProxy work, which are used by your agent to interact with the LLM #################
 
 
 class LLMRole(Enum):
-    SYSTEM = "system"
     USER = "user"
-    ASSISTANT = "assistant"
+    MODEL = "model"
 
 
 class NLPProxy:
@@ -44,8 +61,8 @@ class NLPProxy:
 
         Args:
             prompt (list[tuple[LLMRole, str]]): List of tuples containing the role and text.
-                Use LLMRole.SYSTEM to give the llm background information and LLMRole.USER for user input.
-                LLMRole.ASSISTANT can be used to give the llm an example of how to respond.
+                Use LLMRole.USER to give the llm the prompt and any background information.
+                LLMRole.MODEL can be used to give the llm an example of how to respond.
 
             max_output_tokens (int | None, optional): The maximum number of tokens to output or None for no limit
 
@@ -61,14 +78,14 @@ class NLPProxy:
     async def get_embeddings(
         self, text: str | list[str]
     ) -> np.ndarray | list[np.ndarray]:
-        """Gets a 768-dimensional embedding for the given text
+        """Gets a 3072-dimensional embedding for the given text
 
         Args:
             text (str): Input text. This will counted against the token limit but at a lesser extent than the llm.
                 Every 10 tokens inputted into the embedding model is equivalent to 1 token inputted into the llm.
 
         Returns:
-            np.ndarray: 768-dimensional embedding
+            np.ndarray: 3072-dimensional embedding
         """
         return await self.__token_counter.get_embeddings(text)
 
@@ -97,19 +114,17 @@ class NLPProxy:
 
 # Everything below is for internal use only ####################################################################
 
+GENAI_IS_INITIALIZED = False
 
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-# Please set your API key in the .env file: "TOGETHER_API_KEY=<your-api-key>"
-load_dotenv()
-
-if "TOGETHER_API_KEY" in os.environ:
-    try:
-        client = AsyncTogether()
-    except Exception as e:
-        client = e
-else:
-    client = Exception("Please set your API key in the .env file")
+def initialize_genai():
+    global GENAI_IS_INITIALIZED
+    global client
+    if not GENAI_IS_INITIALIZED:
+        client = genai.Client(
+            vertexai=True, project=GOOGLE_CLOUD_PROJECT, location=GOOGLE_CLOUD_LOCATION
+        )
+        GENAI_IS_INITIALIZED = True
 
 
 # Interfaces ####################################################################
@@ -149,53 +164,71 @@ class Embedding(ABC):
 # Implementations ####################################################################
 
 
-class LlamaTokenizer(LLMTokenizer):
+class GeminiTokenizer(LLMTokenizer):
     def __init__(self):
-        # Use NousResearch bc it doesn't have retricted access
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            "NousResearch/Meta-Llama-3-70B-Instruct"
-        )
+        initialize_genai()
+        self.model_name = "gemini-2.5-flash"
 
     def count_tokens(self, text_or_prompt: str | list[tuple[LLMRole, str]]) -> int:
-        if isinstance(text_or_prompt, str):
-            tokens = self.tokenizer(text_or_prompt).encodings[0].tokens
-            return len(tokens)
-        else:
-            tokens = [
-                self.tokenizer(content).encodings[0].tokens
-                for role, content in text_or_prompt
+        if isinstance(text_or_prompt, list):
+            contents = [
+                Content(role=role.value, parts=[Part(text=text)])
+                for role, text in text_or_prompt
             ]
-            return sum(len(token) for token in tokens)
+        else:
+            if text_or_prompt == "":
+                return 0
+            contents = text_or_prompt
+
+        token_info = client.models.count_tokens(
+            model=self.model_name, contents=contents
+        )
+        return token_info.total_tokens
 
 
-class Llama(LLM):
+class GeminiLLM(LLM):
     def __init__(self):
-        super().__init__()
-        if isinstance(client, Exception):
-            raise client
+        initialize_genai()
+        self.model_name = "gemini-2.5-flash"
 
-    @rate_limit(requests_per_second=1)
     async def prompt(
         self,
         prompt: list[tuple[LLMRole, str]],
         max_output_tokens: int | None = None,
         temperature: float = 0.7,
     ) -> str:
-        messages = [
-            {"role": role.value, "content": content} for role, content in prompt
+        # Convert role/content tuples to GenAI Message objects
+        contents = [
+            Content(role=role.value, parts=[Part(text=text)]) for role, text in prompt
         ]
-        response = await client.chat.completions.create(
-            model="meta-llama/Meta-Llama-3-70B-Instruct-Lite",
-            messages=messages,
-            max_tokens=max_output_tokens,
-            temperature=temperature,
-            top_p=0.7,
-            top_k=50,
-            repetition_penalty=1,
-            stop=["<|eot_id|>"],
-            stream=False,
-        )
-        return response.choices[0].message.content
+
+        # Use asyncio.to_thread to significantly speed up blocking calls
+        def generate_sync():
+            global client
+            return client.models.generate_content(
+                model=self.model_name,
+                contents=contents,
+                config=GenerateContentConfig(
+                    temperature=temperature,
+                    max_output_tokens=max_output_tokens,
+                    thinking_config=ThinkingConfig(thinking_budget=0),
+                ),
+            )
+
+        response = await asyncio.to_thread(generate_sync)
+        
+        # uncomment for debugging prompt/response
+        # concat_prompt = " ".join([f"{role.value}: {text}" for role, text in prompt])
+        # print(f"\tinput: {concat_prompt}\noutput: {response.text}")
+
+        # uncomment for debugging token usage
+        # print(
+        #     f"input tokens: {response.usage_metadata.prompt_token_count}, "
+        #     f"thinking tokens: {response.usage_metadata.thoughts_token_count}, "
+        #     f"max_output_tokens: {max_output_tokens}, "
+        #     f"output: {response.text}"
+        # )
+        return response.text
 
 
 class DummyLLM(LLM):
@@ -210,104 +243,54 @@ class DummyLLM(LLM):
         return "Output from the LLM will be here"
 
 
-class BERTTokenizer(EmbeddingTokenizer):
+class GeminiEmbeddingTokenizer(EmbeddingTokenizer):
+    # set location to "us-central1"
     def __init__(self):
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            "bert-base-uncased", clean_up_tokenization_spaces=True
-        )
+        initialize_genai()
+        # gemini-embedding-001 does not work, but we can estimate with gemini-2.5-flash
+        # self.model_name = "gemini-embedding-001"
+        self.model_name = "gemini-2.5-flash"
 
     def count_tokens(self, text: str | list[str]) -> int:
-        text = [text] if isinstance(text, str) else text
-        token_list = [self.tokenizer(t).encodings[0].tokens for t in text]
-        return sum(len(tokens) for tokens in token_list)
+        global client
+        texts = [text] if isinstance(text, str) else text
+
+        # Filter out empty strings
+        non_empty_texts = [t for t in texts if t != ""]
+
+        if not non_empty_texts:
+            return 0
+
+        combined_text = " ".join(non_empty_texts)
+        token_info = client.models.count_tokens(
+            model=self.model_name, contents=combined_text
+        )
+        return token_info.total_tokens
 
 
-class BERTTogether(Embedding):
+class GeminiEmbedding(Embedding):
     def __init__(self):
-        super().__init__()
-        if isinstance(client, Exception):
-            raise client
-
-    @rate_limit(requests_per_second=50)
-    async def get_embeddings(
-        self, text: str | list[str]
-    ) -> np.ndarray | list[np.ndarray]:
-        """returns a 768-dimensional embedding"""
-        response = await client.embeddings.create(
-            model="togethercomputer/m2-bert-80M-2k-retrieval",
-            input=text,
-        )
-        embeddings = [
-            np.array(response.data[i].embedding) for i in range(len(response.data))
-        ]
-        if isinstance(text, str):
-            return embeddings[0]
-        return embeddings
-
-
-class BERTLocal(Embedding):
-    def __init__(
-        self,
-        device: str = "cpu",
-        batch_size: int = 8,
-    ):
-        self.device = device
-        self.batch_size = batch_size
-
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            "bert-base-uncased",
-            clean_up_tokenization_spaces=True,
-        )
-        self.model = AutoModelForSequenceClassification.from_pretrained(
-            "togethercomputer/m2-bert-80M-2k-retrieval", trust_remote_code=True
-        ).to(device)
-        self.model.eval()
-
-    async def model_loop(self):
-        """Use a loop to optimize with batching"""
-        while True:
-            # Once an item is added to the queue, build as large of a batch as possible (up to batch_size) and process it
-            dequeued = [await self.queue.get()]
-            for _ in range(self.batch_size - 1):
-                try:
-                    dequeued.append(self.queue.get_nowait())
-                except asyncio.QueueEmpty:
-                    break
-
-            # print("batch size", len(dequeued))
-            inputs, futures = zip(*dequeued)
-
-            # tokenize and pad to the longest sequence in the batch
-            input_ids = self.tokenizer(
-                inputs,
-                return_tensors="pt",
-                padding="longest",
-                return_token_type_ids=False,
-            ).to(self.device)
-
-            # run model
-            with torch.no_grad():
-                outputs = self.model(**input_ids)
-
-            embeddings = outputs["sentence_embedding"].detach().cpu().numpy()
-            for future, embedding in zip(futures, embeddings):
-                future.set_result(embedding)
+        initialize_genai()
+        self.model_name = "gemini-embedding-001"
 
     async def get_embeddings(
         self, text: str | list[str]
     ) -> np.ndarray | list[np.ndarray]:
-        """This adds the text to the queue which will be processed in the model_loop
-        the model_loop will then set the future with the embedding"""
-        if not hasattr(self, "model_loop_task") or self.model_loop_task.cancelled():  # type: ignore
-            self.queue: asyncio.Queue[tuple[str, asyncio.Future]] = asyncio.Queue()
-            self.model_loop_task = asyncio.create_task(self.model_loop())
-        text_list = [text] if isinstance(text, str) else text
-        futures = []
-        for t in text_list:
-            future = asyncio.get_event_loop().create_future()
-            self.queue.put_nowait((t, future))
-            futures.append(future)
-        embeddings = await asyncio.gather(*futures)
+        """Returns embeddings using Vertex AI's textembedding-gecko model."""
+        texts = [text] if isinstance(text, str) else text
+
+        # Use asyncio.to_thread to significantly speed up blocking calls
+        def get_embeddings_sync():
+            # Use batch processing - embed_content can handle a list of texts
+            response = client.models.embed_content(
+                model=self.model_name, contents=texts
+            )
+            # Extract embeddings from response
+            embeddings = [np.array(emb.values) for emb in response.embeddings]
+            return embeddings
+
+        embeddings = await asyncio.to_thread(get_embeddings_sync)
+
         if isinstance(text, str):
             return embeddings[0]
         return embeddings
@@ -318,17 +301,19 @@ class DummyEmbedding(Embedding):
         self, text: str | list[str]
     ) -> np.ndarray | list[np.ndarray]:
         if isinstance(text, str):
-            return np.zeros(768)
-        return [np.zeros(768) for _ in text]
+            return np.zeros(3072)  # Updated to match Gemini embedding dimension
+        return [np.zeros(3072) for _ in text]
 
 
 @dataclass
 class NLP:
     """Used for the single, main NLP instance in the runtime"""
 
-    llm_tokenizer: LLMTokenizer = field(default_factory=LlamaTokenizer)
+    llm_tokenizer: LLMTokenizer = field(default_factory=GeminiTokenizer)
     llm: LLM = field(default_factory=DummyLLM)
-    embedding_tokenizer: EmbeddingTokenizer = field(default_factory=BERTTokenizer)
+    embedding_tokenizer: EmbeddingTokenizer = field(
+        default_factory=GeminiEmbeddingTokenizer
+    )
     embedding: Embedding = field(default_factory=DummyEmbedding)
 
     async def prompt_llm(
@@ -361,6 +346,7 @@ class TokenCounterWrapper:
 
     nlp: NLP = field(default_factory=NLP)
     token_limit: int = 1000
+    player_name: str | None = None
 
     def __post_init__(self):
         self.reset_token_counter()
@@ -387,8 +373,20 @@ class TokenCounterWrapper:
             output = await self.nlp.prompt_llm(prompt, max_output_tokens, temperature)
             self.remaining_tokens -= self.nlp.count_llm_tokens(output)
 
-            if self.remaining_tokens <= 0:
+            if self.remaining_tokens < 0:
                 output += " <out of tokens>"
+
+        if LLM_VERBOSE:
+            prompt_text = " ".join(
+                [f"{role.value}: {text}" for role, text in prompt]
+            )
+            player_info = (
+                f" for player {self.player_name}" if self.player_name else ""
+            )
+            print(
+                f"[LLM call{player_info}]\n\tInput: {prompt_text}\n\tOutput: {output}\n"
+            )
+
 
         return output
 
@@ -398,8 +396,8 @@ class TokenCounterWrapper:
         self.remaining_tokens -= math.ceil(self.nlp.count_embedding_tokens(text) / 10)
         if self.remaining_tokens < 0:
             if isinstance(text, str):
-                return np.zeros(768)
-            return [np.zeros(768) for _ in text]
+                return np.zeros(3072)
+            return [np.zeros(3072) for _ in text]
 
         return await self.nlp.get_embeddings(text)
 
@@ -411,55 +409,57 @@ class TokenCounterWrapper:
 
 
 if __name__ == "__main__":
-    pass
+    # run this to test all the components
     event_loop = asyncio.get_event_loop()
-    # llm_tokenizer = LlamaTokenizer()
-    # tokens = llm_tokenizer.count_tokens("How many US states are there?")
-    # print(tokens)
 
-    # llm = Llama()
-    # prompt = [(LLMRole.USER, "How many US states are there?")]
-    # output = event_loop.run_until_complete(llm.prompt(prompt, 100))
-    # print(output)
+    llm_tokenizer = GeminiTokenizer()
+    tokens = llm_tokenizer.count_tokens("How many US states are there?")
+    print(tokens)
 
-    # bert_tokenizer = BERTTokenizer()
-    # tokens = bert_tokenizer.count_tokens("How many US states are there?")
-    # print(tokens)
+    llm = GeminiLLM()
+    prompt = [(LLMRole.USER, "How many US states are there?")]
+    output = event_loop.run_until_complete(llm.prompt(prompt, 20))
+    print(output)
 
-    # tokens = bert_tokenizer.count_tokens(["How many", "US states are there?"])
-    # print(tokens)
+    embedding_tokenizer = GeminiEmbeddingTokenizer()
+    tokens = embedding_tokenizer.count_tokens("How many US states are there?")
+    print(tokens)
 
-    # bert = BERTTogether()
-    # output = event_loop.run_until_complete(bert.get_embeddings("How many US states are there?"))
-    # print(type(output))
-    # print(len(output))
+    tokens = embedding_tokenizer.count_tokens(["How many", "US states are there?"])
+    print(tokens)
 
-    # output = event_loop.run_until_complete(bert.get_embeddings(["How many", "US states are there?"]))
-    # print(type(output))
-    # print(len(output))
+    embedding_model = GeminiEmbedding()
+    output = event_loop.run_until_complete(
+        embedding_model.get_embeddings("How many US states are there?")
+    )
+    print(f"first 5: {output[:5]}")
+    print(type(output))
+    print(len(output))
 
-    # bert = BERTLocal()
-    # output = event_loop.run_until_complete(
-    #     bert.get_embeddings("How many US states are there?")
-    # )
-    # print(type(output))
-    # print(len(output))
+    output = event_loop.run_until_complete(
+        embedding_model.get_embeddings(["How many", "US states are there?"])
+    )
+    print(type(output))
+    print(len(output))
 
-    # output = event_loop.run_until_complete(
-    #     bert.get_embeddings(["How many", "US states are there?"])
-    # )
-    # print(type(output))
-    # print(len(output))
+    output = event_loop.run_until_complete(
+        embedding_model.get_embeddings(["How many", "US states are there?"])
+    )
+    print(type(output))
+    print(len(output))
 
-    # bert = DummyEmbedding()
-    # output = event_loop.run_until_complete(
-    #     bert.get_embeddings("How many US states are there?")
-    # )
-    # print(type(output))
-    # print(len(output))
+    embedding_model = DummyEmbedding()
+    output = event_loop.run_until_complete(
+        embedding_model.get_embeddings("How many US states are there?")
+    )
+    print(f"first 5: {output[:5]}")
+    print(type(output))
+    print(len(output))
 
-    # output = event_loop.run_until_complete(
-    #     bert.get_embeddings(["How many", "US states are there?"])
-    # )
-    # print(type(output))
-    # print(len(output))
+    output = event_loop.run_until_complete(
+        embedding_model.get_embeddings(["How many", "US states are there?"])
+    )
+    print(type(output))
+    print(len(output))
+    print(type(output))
+    print(len(output))

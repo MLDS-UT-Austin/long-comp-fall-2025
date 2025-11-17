@@ -5,66 +5,65 @@ from enum import Enum
 
 # All possible locations in the game
 class Location(Enum):
-    AIRPLANE = "Airplane"
-    BANK = "Bank"
-    BEACH = "Beach"
-    BROADWAY_THEATER = "Broadway Theater"
-    CASINO = "Casino"
-    CATHEDRAL = "Cathedral"
-    CIRCUS_TENT = "Circus Tent"
-    CORPORATE_PARTY = "Corporate Party"
-    CRUSADER_ARMY = "Crusader Army"
-    DAY_SPA = "Day Spa"
-    EMBASSY = "Embassy"
-    HOSPITAL = "Hospital"
-    HOTEL = "Hotel"
-    MILITARY_BASE = "Military Base"
-    MOVIE_STUDIO = "Movie Studio"
-    OCEAN_LINER = "Ocean Liner"
-    PASSENGER_TRAIN = "Passenger Train"
-    PIRATE_SHIP = "Pirate Ship"
-    POLAR_STATION = "Polar Station"
-    POLICE_STATION = "Police Station"
-    RESTAURANT = "Restaurant"
-    SCHOOL = "School"
-    SERVICE_STATION = "Service Station"
-    SPACE_STATION = "Space Station"
-    SUBMARINE = "Submarine"
-    SUPERMARKET = "Supermarket"
-    UNIVERSITY = "University"
+    BLANTON_MUSEUM = "Blanton Museum"
+    HARRY_RANSOM_CENTER = "Harry Ransom Center"
+    LBJ_LIBRARY = "LBJ Library"
+    FLAWN_ACADEMIC_CENTER = "Flawn Academic Center"
+    ART_BUILDING_AND_MUSEUM = "Art Building and Museum"
+    GATES_DELL_COMPLEX = "Gates Dell Complex"
+    CHRISTIAN_GREEN_GALLERY = "Christian Green Gallery"
+    FINE_ARTS_LIBRARY = "Fine Arts Library"
+    DARRELL_K_ROYAL_TEXAS_MEMORIAL_STADIUM = "Darrell K Royal Texas Memorial Stadium"
+    GREGORY_GYM = "Gregory Gym"
+    TEXAS_MEMORIAL_MUSEUM = "Texas Memorial Museum"
+    UT_TOWER = "UT Tower"
+    LITTLEFIELD_FOUNTAIN = "Littlefield Fountain"
+    TURTLE_POND = "Turtle Pond"
+    THE_DRAG = "The Drag"
+    NORMAN_HACKERMAN_BUILDING = "Norman Hackerman Building"
+    WCP_STUDENT_ACTIVITY_CENTER = "WCP Student Activity Center"
+    TEXAS_STATE_CAPITOL = "Texas State Capitol"
+    MOUNT_BONNELL_AND_MAYFIELD_PARK = "Mount Bonnell & Mayfield Park"
+    BARTON_SPRINGS = "Barton Springs"
+    ZILKER_PARK = "Zilker Park"
+    LAKE_AUSTIN = "Lake Austin"
+    LADY_BIRD_JOHNSON_WILDFLOWER_CENTER = "Lady Bird Johnson Wildflower Center"
+    ZILKER_BOTANICAL_GARDEN = "Zilker Botanical Garden"
+    CONGRESS_AVENUE_BRIDGE = "Congress Avenue Bridge"
+    SOUTH_CONGRESS = "South Congress"
 
 
 # A dictionary that can optionally be used by agents to redact LLM output based on the location
 # fmt: off
 redaction_dict = {
-    Location.AIRPLANE: ["airplane", "plane", "aircraft", "jet", "flight attendant", "flight", "pilot", "cockpit", "cabin", "turbulence", "boarding", "takeoff", "landing"],
-    Location.BANK: ["bank", "money", "vault", "teller", "robbery", "robber", "heist", "cash", "rob", "atm", "loan", "account", "interest", "deposit", "safe"],
-    Location.BEACH: ["beach", "sand", "ocean", "surf", "waves", "sun", "shell", "towel", "umbrella", "lifeguard"],
-    Location.BROADWAY_THEATER: ["broadway theater", "broadway", "theater", "stage", "musical", "curtain", "play", "actor", "audience", "script"],
-    Location.CASINO: ["casino", "gamble", "chips", "cards", "slot", "blackjack", "dealer", "roulette", "poker", "bet", "baccarat", "craps", "high roller"],
-    Location.CATHEDRAL: ["cathedral", "church", "priest", "altar", "choir", "holy", "religion", "saint", "mass", "bishop", "nun", "confession"],
-    Location.CIRCUS_TENT: ["circus tent", "circus", "tent", "clown", "ringmaster", "elephant", "juggler", "trapeze", "lion", "acrobat"],
-    Location.CORPORATE_PARTY: ["corporate party", "corporate", "party", "boss", "employee", "office", "colleagues"],
-    Location.CRUSADER_ARMY: ["crusader army", "crusader", "crusade", "knight", "sword", "war", "shield", "battle", "siege"],
-    Location.DAY_SPA: ["day spa", "spa", "massage", "facial", "sauna", "pamper", "steam room", "treatment", "manicure"],
-    Location.EMBASSY: ["embassy", "diplomat", "ambassador", "visa", "passport", "consulate", "foreign"],
-    Location.HOSPITAL: ["hospital", "doctor", "nurse", "patient", "surgery", "medic", "stretcher", "ward", "emergency", "diagnosis", "prescription"],
-    Location.HOTEL: ["hotel", "concierge", "lobby", "room service", "suite", "reception"],
-    Location.MILITARY_BASE: ["military base", "military", "base", "tank", "soldier", "barracks", "general", "mission", "drill"],
-    Location.MOVIE_STUDIO: ["movie studio", "movie", "studio", "film", "director", "set", "producer", "actor", "props", "script", "camera"],
-    Location.OCEAN_LINER: ["ocean liner", "liner", "cruise", "deck", "captain", "port", "voyage"],
-    Location.PASSENGER_TRAIN: ["passenger train", "train", "conductor", "rail", "track", "station", "platform", "ticket", "carriage"],
-    Location.PIRATE_SHIP: ["pirate ship", "pirate", "treasure", "parrot", "plank", "cannon", "sail", "buccaneer", "map", "cutlass", "anchor", "mutiny"],
-    Location.POLAR_STATION: ["polar station", "polar", "snow", "ice", "cold", "frozen", "research", "blizzard", "penguin"],
-    Location.POLICE_STATION: ["police station", "police", "officer", "arrest", "criminal", "badge", "detective", "handcuff", "cell", "investigation", "siren", "warrant"],
-    Location.RESTAURANT: ["restaurant", "waiter", "chef", "menu", "dine", "meal", "table", "food", "drink", "reservation", "kitchen", "bill"],
-    Location.SCHOOL: ["school", "teacher", "principal", "teach", "subject", "homework", "classroom", "lesson"],
-    Location.SERVICE_STATION: ["service station", "station", "gas", "mechanic", "repair", "fuel", "oil", "car", "tires", "service", "tune-up", "garage", "brakes"],
-    Location.SPACE_STATION: ["space station", "space", "station", "astronaut", "orbit", "zero gravity", "gravity", "shuttle", "capsule", "moon", "nasa", "spacex", "module", "experiment", "commander"],
-    Location.SUBMARINE: ["submarine", "underwater", "torpedo", "sonar", "deep", "periscope", "dive", "hatch", "crew"],
-    Location.SUPERMARKET: ["supermarket", "store", "cashier", "cart", "groceries", "checkout", "barcode", "aisle", "product", "bag"],
-    Location.UNIVERSITY: ["university", "student", "professor", "lecture", "campus", "degree", "exam", "college", "graduate", "teach", "subject", "faculty", "research", "lecture hall"],
+    Location.BLANTON_MUSEUM: ["blanton", "museum", "art", "gallery", "exhibit", "painting", "curator"],
+    Location.HARRY_RANSOM_CENTER: ["ransom center", "harry ransom", "archive", "manuscript", "collection", "literature", "photography"],
+    Location.LBJ_LIBRARY: ["lbj", "library", "museum", "presidential", "johnson", "exhibit", "archives"],
+    Location.FLAWN_ACADEMIC_CENTER: ["flawn", "academic center", "study room", "tutoring", "library", "student"],
+    Location.ART_BUILDING_AND_MUSEUM: ["art building", "museum", "studio", "exhibit", "painting", "sculpture"],
+    Location.GATES_DELL_COMPLEX: ["gates dell complex", "gdc", "computer science", "programming", "lab", "coding", "engineering"],
+    Location.CHRISTIAN_GREEN_GALLERY: ["christian-green", "gallery", "art", "exhibit", "curator", "installation"],
+    Location.FINE_ARTS_LIBRARY: ["fine arts library", "library", "books", "research", "fine arts", "study", "quiet zone"],
+    Location.DARRELL_K_ROYAL_TEXAS_MEMORIAL_STADIUM: ["darrell k royal", "stadium", "football", "longhorns", "game day", "fans", "scoreboard"],
+    Location.GREGORY_GYM: ["gregory gym", "gym", "workout", "weights", "basketball", "pool", "fitness"],
+    Location.TEXAS_MEMORIAL_MUSEUM: ["texas memorial museum", "museum", "dinosaur", "fossil", "exhibit", "science", "natural history"],
+    Location.UT_TOWER: ["ut tower", "tower", "university landmark", "campus", "clock tower", "observation deck"],
+    Location.LITTLEFIELD_FOUNTAIN: ["littlefield fountain", "fountain", "statue", "memorial", "landmark", "water feature"],
+    Location.TURTLE_POND: ["turtle pond", "pond", "turtle", "wildlife", "water", "nature", "quiet area"],
+    Location.THE_DRAG: ["the drag", "guadalupe", "shops", "street", "café", "restaurant", "thrift", "traffic"],
+    Location.NORMAN_HACKERMAN_BUILDING: ["norman hackerman building", "nhb", "chemistry", "research", "lab", "science", "lecture"],
+    Location.WCP_STUDENT_ACTIVITY_CENTER: ["wcp", "student activity center", "union", "study", "event", "meeting", "food court"],
+    Location.TEXAS_STATE_CAPITOL: ["texas state capitol", "capitol", "government", "legislature", "governor", "building", "austin landmark"],
+    Location.MOUNT_BONNELL_AND_MAYFIELD_PARK: ["mt bonnell", "mayfield park", "peacock", "hike", "viewpoint", "scenic", "trail"],
+    Location.BARTON_SPRINGS: ["barton springs", "pool", "spring", "swim", "bathing", "cold water", "zilker"],
+    Location.ZILKER_PARK: ["zilker park", "zilker", "park", "picnic", "festival", "trail", "outdoors"],
+    Location.LAKE_AUSTIN: ["lake austin", "lake", "boat", "kayak", "water", "dock", "scenic"],
+    Location.LADY_BIRD_JOHNSON_WILDFLOWER_CENTER: ["wildflower center", "lady bird johnson", "wildflower", "garden", "native plants", "botanical"],
+    Location.ZILKER_BOTANICAL_GARDEN: ["zilker botanical garden", "botanical", "garden", "plants", "flowers", "greenhouse", "pond"],
+    Location.CONGRESS_AVENUE_BRIDGE: ["congress avenue bridge", "bridge", "bats", "downtown", "austin skyline", "river"],
+    Location.SOUTH_CONGRESS: ["south congress", "soco", "shopping", "restaurants", "street", "murals", "austin"],
 }
+
 # fmt: on
 
 # Everthing below is for internal use to generate the game dialogue #####################################

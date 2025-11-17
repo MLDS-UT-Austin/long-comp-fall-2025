@@ -7,13 +7,11 @@ from util import *
 if __name__ == "__main__":
     # Select the NLP model to use ####################################################
 
-    # 1: Use Together.ai for Llama and BERT
-    nlp = NLP(llm=Llama(), embedding=BERTTogether())
+    # 1: Use Google Cloud for Gemini LLM and Embeddings
+    nlp = NLP(llm=GeminiLLM(), embedding=GeminiEmbedding())
 
-    # 2: Use Together.ai for Llama but run BERT locally
-    # nlp = NLP(llm = Llama(), embedding=BERTLocal(batch_size=8))
-
-    # 3: Output the same string for every question and return a 0 array for every embedding
+    # 2: Output the same string for every question and return a 0 array for every embedding
+    # (useful for debugging)
     # nlp = NLP(llm=DummyLLM(), embedding=DummyEmbedding())
 
     # Load agents from specific files ####################################################
@@ -27,7 +25,7 @@ if __name__ == "__main__":
     # Run a single game ####################################################
     # Feel free to edit the players, duplicate players are allowed
     game = Game(
-        player_names=["Team Name Here", "MLDS 0", "MLDS 1", "MLDS 2", "MLDS 3", "MLDS 4"],
+        player_names=["Team Name Here", "MLDS 0", "MLDS 1", "MLDS 2", "NLP Meeting", "Pattern Matcher"],
         nlp=nlp,
         n_rounds=20,
     )
@@ -45,7 +43,7 @@ if __name__ == "__main__":
 
     # Run multiple games with randomly sampled agents ####################################################
     sim = Simulation(
-        nlp, agent_names=["Team Name Here", "MLDS 0", "MLDS 1", "MLDS 2", "MLDS 3", "MLDS 4"], team_size=8
+        nlp, agent_names=["Team Name Here", "MLDS 0", "MLDS 1", "MLDS 2", "NLP Meeting", "Pattern Matcher"], team_size=6
     )
     sim.validate_agents()
     sim.run(n_games=10)

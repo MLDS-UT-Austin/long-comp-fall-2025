@@ -2,9 +2,9 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import final
 
-from data import Location, redaction_dict
+from data import Location
 from nlp import LLMRole, NLPProxy
-from util import redact, relative_path_decorator
+from util import relative_path_decorator
 
 # This file explains what each method in the Agent class should do ######################
 
@@ -97,7 +97,7 @@ class Agent(ABC):
             Location | None: The location guessed by the agent or None if the agent does not want to guess
                 Note: The agent can only guess once per game
         """
-        return Location.AIRPLANE
+        return Location.BLANTON_MUSEUM
 
     @abstractmethod
     async def accuse_player(self) -> int | None:
@@ -125,9 +125,9 @@ class Agent(ABC):
         nlp = NLPProxy()
         for _ in range(100):
             for loc, n_players in [
-                (Location.AIRPLANE, 3),
+                (Location.BLANTON_MUSEUM, 3),
                 (None, 3),
-                (Location.BEACH, 10),
+                (Location.HARRY_RANSOM_CENTER, 10),
                 (None, 10),
             ]:
                 agent = cls(loc, n_players, 5, nlp)

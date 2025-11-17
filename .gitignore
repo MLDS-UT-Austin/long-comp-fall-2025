@@ -1,6 +1,6 @@
 games
 .vscode
-.DS_Store
+credentials/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -8,7 +8,7 @@ praat-parselmouth
 pygame
 python-dotenv
 soundfile
-together
 torch
 tqdm
 transformers
+google-cloud-aiplatform

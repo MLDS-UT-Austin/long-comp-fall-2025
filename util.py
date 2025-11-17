@@ -16,28 +16,10 @@ import numpy as np
 import parselmouth
 from gtts import gTTS  # type: ignore
 from parselmouth.praat import call
-from together.error import RateLimitError
 
 from data import *
 
-# Feel free to use redact() in your agent:
-
-
-def redact(text: str, location: Location, redacted_text: str = "<REDACTED>") -> str:
-    """Can optionally by used by agents to redact text based on the location
-    This can be useful to prevent the LLM from giving away the location
-    Note: this is not called in game.py
-    Args:
-        text (str): text to redact
-        location (Location): the location to redact
-        redacted_text (str, optional): what to replace the redacted text with
-    """
-    for word in redaction_dict[location]:
-        text = re.sub(rf"{word}", redacted_text, text, flags=re.IGNORECASE)
-    return text
-
-
-# Everything below is for internal use ###############################################
+# Everything here is for internal use ###############################################
 
 
 def count_votes(votes: list[int | None], n_players: int) -> int | None:
@@ -65,7 +47,7 @@ def sample_agents(
     n_spies: int = 1,
     verbose: bool = False,
     max_same_agent: int = 2,
-) -> list[tuple[list[str], int]]:
+) -> list[tuple[list[str], list[int]]]:
     """Sample agents for a game, ensuring fairness for both game count and spy count
 
     Args:
@@ -76,7 +58,7 @@ def sample_agents(
         max_same_agent (int, optional): maximum number of the same agent in a game. Defaults to 2.
 
     Returns:
-        list[tuple[list[str], int]]: list of tuples containing the agents in each game and the spy index
+        list[tuple[list[str], list[int]]]: list of tuples containing the agents in each game and the spy indices
     """
 
     # Initialize counters for fairness
@@ -104,16 +86,15 @@ def sample_agents(
                 game_agents.append(agent)
                 agent_count[agent] += 1
 
-        # Randomly assign one agent as the spy, ensuring fairness
-        spy_ids = random.sample(range(team_size), n_spies)
-        spy_names = [game_agents[i] for i in spy_ids]
+        # Randomly assign two agents as spies, ensuring fairness
+        spy_indices = random.sample(range(team_size), 2)
+        spy_names = [game_agents[i] for i in spy_indices]
 
         for spy_name in spy_names:
             spy_count[spy_name] += 1
-        
         game_agents_count["".join(sorted(game_agents))] += 1
 
-        output.append((game_agents, spy_ids))
+        output.append((game_agents, spy_indices))
 
     if verbose:
         print(agent_count)
@@ -174,38 +155,6 @@ def relative_path_decorator(cls):
             setattr(cls, attr_name, wrapped_method)
 
     return cls
-
-
-def rate_limit(requests_per_second: int):
-    """A decorator to rate limit a function to a certain number of requests per second
-    Args:
-        requests_per_second (int): the number of requests per second
-    """
-
-    def decorator(func):
-        last_time = 0
-        request_lock = asyncio.Lock()
-
-        @wraps(func)
-        async def wrapper(*args, **kwargs):
-            async with request_lock:
-                nonlocal last_time
-                await asyncio.sleep(
-                    last_time + (1 / requests_per_second) - time.monotonic()
-                )
-                last_time = time.monotonic()
-            while True:
-                wait_time = 0.1
-                try:
-                    return await func(*args, **kwargs)
-                except RateLimitError:
-                    # exponential backoff
-                    await asyncio.sleep(wait_time)
-                    wait_time *= 1.2
-
-        return wrapper
-
-    return decorator
 
 
 VOICES = [

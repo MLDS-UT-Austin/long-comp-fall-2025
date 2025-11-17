@@ -68,8 +68,8 @@ class Simulation:
 
         # Run games concurrently
         games = [
-            Game(self.nlp, agents, self.n_rounds, spy_id)
-            for agents, spy_id in sampled_agent_names_and_spies
+            Game(self.nlp, agents, self.n_rounds, spy_ids)
+            for agents, spy_ids in sampled_agent_names_and_spies
         ]
         for game in games:
             game.tqdm_bar = tqdm_bar

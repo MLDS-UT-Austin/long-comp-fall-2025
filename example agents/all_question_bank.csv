@@ -1,4 +1,4 @@
-﻿location,question,answer
+location,question,answer
 General,Do you spend a lot of time sitting or standing here?,It depends on the situation.
 General,Is this place typically noisy or quiet?,"It varies, sometimes it's noisy, other times quiet."
 General,How do people usually dress in this environment?,People dress differently depending on the occasion.
@@ -49,138 +49,153 @@ General,"Is there a lot of talking, or is it quieter here?","You hear some talki
 General,Is there a strong sense of community in this place?,"Yes, people often feel connected here."
 General,"Do you feel safe here, or is it more risky?","It's generally safe, but caution is sometimes needed."
 General,"Is this a place where people learn, work, or relax?","It is a mix of learning, work, and relaxation."
-Airplane,How often do you get to stand up during your time here?,"Not much, it's restricted."
-Airplane,What kind of noises do you hear throughout your time here?,Mostly engine noise and announcements.
-Airplane,Do you find yourself looking out of windows often?,"Yes, when possible."
-Airplane,How much personal space do you have in this place?,"Very little, it's a tight space."
-Airplane,Do you interact with many people in this environment?,"Yes, especially with the staff."
-Bank,Do you see a lot of security measures around you?,"Yes, security is a priority here."
-Bank,What are people typically holding when they come here?,They often have paperwork or items to deposit.
-Bank,Do you see people standing in lines often here?,"Yes, lines are pretty common here."
-Bank,Is there a lot of counting involved at this place?,"Yes, a lot of numbers being handled."
-Bank,Do you handle paperwork while here?,"Yes, it is a standard part of the process."
-Beach,Do you notice people dressing very casually here?,"Yes, people tend to dress comfortably."
-Beach,Is it common to see large gatherings of people here?,"Yes, gatherings and socializing are common."
-Beach,How is the weather typically when you're in this place?,It's usually sunny and warm.
-Beach,Do you carry a lot of things with you when you come here?,"I bring a few essentials, nothing too heavy."
-Beach,What kind of footwear is common here?,Mostly sandals or bare feet.
-Broadway Theater,Do you see performers working when you're here?,"Yes, performers are a key part of this environment."
-Broadway Theater,Are you typically sitting down when you're in this place?,"Yes, most of the time you're seated."
-Broadway Theater,Do you see a lot of people watching something at the same time?,"Yes, it's a shared experience."
-Broadway Theater,Is there a lot of clapping or applause in this environment?,"Yes, clapping is frequent after performances."
-Broadway Theater,Do you spend most of your time here in the dark?,"Yes, the environment is typically dim during performances."
-Casino,Is this place usually noisy or quiet?,It's usually quite noisy.
-Casino,Are there a lot of flashing lights where you are?,"Yes, lights and sounds are everywhere."
-Casino,Do people spend a lot of money in this environment?,"Yes, people spend money constantly here."
-Casino,Do people tend to come here for entertainment?,"Yes, it's a popular place for entertainment."
-Casino,Do you see people taking risks when you're here?,"Yes, many people gamble or make bets."
-Cathedral,Do people tend to speak softly in this place?,"Yes, people are generally quiet here."
-Cathedral,Is it common to see people sitting for long periods here?,"Yes, sitting for extended periods is common."
-Cathedral,Is this place very decorative or plain?,It is often very ornate and grand.
-Cathedral,Do people often look upwards in this environment?,"Yes, people often look upwards towards the ceiling."
-Cathedral,Do you hear music often in this setting?,"Yes, music is a common part of the experience."
-Circus Tent,Is the environment here more for entertainment or work?,"It is mostly for entertainment, but people do work here too."
-Circus Tent,Do you see a lot of movement in this place?,"Yes, there is a lot of activity and movement."
-Circus Tent,What kind of noises are common in this environment?,"Loud noises like cheering, music, and sometimes animals."
-Circus Tent,Is the attire here formal or casual?,The attire is more casual or theatrical.
-Circus Tent,Do people tend to come here alone or with others?,People usually come in groups or with family.
-Corporate Party,Do people come here to relax or network?,"It's a mix, some are here to relax while others network."
-Corporate Party,Is there a lot of small talk in this environment?,"Yes, small talk is quite common in this setting."
-Corporate Party,What kind of refreshments are typically available?,"Usually light refreshments, appetizers, and drinks."
-Corporate Party,Is the lighting here bright or more dim?,"It is more dim, giving it a relaxed or social atmosphere."
-Corporate Party,Do people know each other before coming here?,"Some people do, but not everyone knows each other."
-Crusader Army,Is there a sense of urgency in this place?,"Yes, there's a strong sense of urgency here."
-Crusader Army,Do you see a lot of physical activity happening here?,"Yes, physical activity is constant in this environment."
-Crusader Army,Is the attire functional or decorative?,"It's mostly functional, but there are some decorative elements."
-Crusader Army,Is this place associated with a specific historical period?,"Yes, this place is tied to a specific period in history."
-Crusader Army,Do people work together or individually here?,"People work closely together, often in teams."
-Day Spa,Is this a place people come to feel better physically or mentally?,"Both, people come to feel better mentally and physically."
-Day Spa,Are there a lot of special tools or equipment used here?,"Yes, special tools are an essential part of the experience."
-Day Spa,Is the atmosphere here calm or hectic?,It is usually very calm and relaxing.
-Day Spa,Do people come here for a short or long visit?,People typically come for a longer stay to fully enjoy it.
-Day Spa,Is there a specific scent or fragrance you associate with this place?,"Yes, there is often a relaxing fragrance in the air."
-Embassy,Is this place associated with international relations?,"Yes, it deals with matters between countries."
-Embassy,Are there security measures in place here?,"Yes, security is a key part of this environment."
-Embassy,Do people need appointments to come here?,"Yes, most visitors need appointments or clearance."
-Embassy,Is the setting formal or casual?,The environment is quite formal.
-Embassy,Are there official documents involved in this environment?,"Yes, official documents are commonly dealt with here."
-Hospital,Is the atmosphere here more urgent or relaxed?,"The atmosphere is often urgent, but some areas are calmer."
-Hospital,Do people wear uniforms in this place?,"Yes, uniforms are standard here."
-Hospital,Is it common to see a lot of technology in use here?,"Yes, technology is heavily used throughout the space."
-Hospital,Is this place primarily focused on helping people?,"Yes, helping people is the primary focus here."
-Hospital,Do people stay here long or do they leave quickly?,"Some stay for a while, but others leave after quick visits."
-Hotel,Is this a place people come to for short stays or extended periods?,"It depends, some stay for short periods while others stay longer."
-Hotel,Is the service here formal or casual?,"Service is typically formal, but it can be friendly."
-Hotel,Do you see a lot of people with luggage here?,"Yes, luggage is common as people are often traveling."
-Hotel,Is this place associated with travel?,"Yes, hotels are strongly associated with travel."
-Hotel,Do people spend most of their time here inside or outside?,Most people spend their time indoors in this environment.
-Police Station,Is the atmosphere here tense or relaxed?,"It's often tense, but it depends on the situation."
-Police Station,Do people come here by choice or necessity?,"Mostly out of necessity, but sometimes by choice."
-Police Station,Is there a lot of paperwork involved here?,"Yes, paperwork is a major part of what happens here."
-Police Station,Do you see people in uniforms frequently?,"Yes, uniforms are common in this place."
-Police Station,Is this place associated with enforcing rules?,"Yes, enforcing rules is a key function here."
-Restaurant,Do people come here to relax or for something else?,Most come to relax and enjoy a meal.
-Restaurant,Is there a lot of talking in this environment?,"Yes, conversations are frequent here."
-Restaurant,What kind of attire is common here?,"Attire ranges from casual to formal, depending on the place."
-Restaurant,Do people spend a lot of time here or just a little?,"It depends, but most don't stay too long."
-Restaurant,Do you interact with the staff often here?,"Yes, interacting with staff is common."
-School,Is this place usually quiet or noisy?,"It's usually noisy, but some areas are quieter."
-School,Do you often see people of different ages here?,"Yes, you see people of all ages, mostly younger."
-School,Is this a place for learning or for something else?,It is mostly for learning.
-School,Is there a schedule people follow here?,"Yes, a strict schedule is followed."
-School,Do people bring their own materials or use what's provided?,"People bring their own materials, but some are provided."
-Service Station,Is this a place people visit often or only when needed?,People come when they need something specific.
-Service Station,Is there a lot of equipment or tools here?,"Yes, tools and equipment are essential here."
-Service Station,Do people stay here long or is it a quick stop?,"It's usually a quick stop, not a long stay."
-Service Station,Do people work with their hands in this environment?,"Yes, it's very hands-on work here."
-Service Station,"Is this place indoors, outdoors, or a mix of both?","It is a mix, partly indoors and partly outdoors."
-Space Station,Is it easy to move around in this environment?,"It is not easy, movement can be challenging."
-Space Station,Is there a lot of technology being used here?,"Yes, advanced technology is used constantly."
-Space Station,Is this place associated with scientific research?,"Yes, research is a major focus here."
-Space Station,Do you interact with the same people frequently here?,"Yes, you interact with the same group for long periods."
-Space Station,Is it common to spend a lot of time looking outside?,"Yes, looking outside is a unique part of being here."
-Submarine,Is the space here confined or open?,The space is very confined and tight.
-Submarine,Do you interact with a lot of people or a few?,You interact with only a small group of people.
-Submarine,Is the environment here related to travel or exploration?,It is more about exploration and operations.
-Submarine,Is it noisy or quiet in this environment?,"It can be noisy, but sometimes it is quieter."
-Submarine,Do people stay in this place for a long period or short?,People stay here for extended periods of time.
-Supermarket,Do people come here regularly or just occasionally?,Many people come here regularly for supplies.
-Supermarket,Is it common to see a lot of movement here?,"Yes, it is usually very busy with a lot of movement."
-Supermarket,Do you interact with a lot of different people here?,"Yes, you encounter a variety of people here."
-Supermarket,Is there a lot of organization in this environment?,"Yes, organization is key in this environment."
-Supermarket,Do people bring things with them or leave with things?,People usually leave with what they need.
-University,Is this place for studying or something else?,It is mainly for studying and education.
-University,Do you see people of different ages in this environment?,"Yes, you see people of all ages, especially students."
-University,Is there a lot of talking or is it more quiet?,There is usually a lot of talking and activity.
-University,Do people stay in one place or move around a lot here?,People are constantly moving from place to place.
-University,Is the atmosphere here relaxed or more serious?,"It is a mix, but can be more serious during certain times."
-Military Base,Is security a major aspect of this place?,"Yes, security is essential here."
-Military Base,Do you see people working in uniform here?,"Yes, uniforms are common in this environment."
-Military Base,Is there a sense of discipline in the environment?,"Yes, discipline is highly valued here."
-Military Base,Do people spend long periods away from family here?,"Yes, people often stay here for long stretches."
-Military Base,Is this place associated with specific missions?,"Yes, specific missions are associated with this place."
-Movie Studio,Do you see a lot of cameras and equipment around?,"Yes, there are cameras and various gear everywhere."
-Movie Studio,Is this place usually quiet or full of action?,It's usually very action-packed.
-Movie Studio,Do people wear a lot of costumes here?,"Yes, costumes are common depending on the work."
-Movie Studio,Is the work here creative or more technical?,It's a mix of creativity and technical expertise.
-Movie Studio,Are there specific schedules or routines followed here?,"Yes, routines and schedules are crucial here."
-Ocean Liner,Is this place associated with travel or relaxation?,It's mostly for travel and relaxation.
-Ocean Liner,Are there many different activities available here?,"Yes, there's a variety of activities available."
-Ocean Liner,Do you meet people from different backgrounds?,"Yes, people come from all over."
-Ocean Liner,Is there a lot of water surrounding this environment?,"Yes, it's surrounded by water on all sides."
-Ocean Liner,Do people stay here for an extended period?,"Yes, people usually stay on board for a while."
-Passenger Train,Is this place constantly moving or stationary?,It's moving almost all the time.
-Passenger Train,Do you see people coming and going frequently?,"Yes, people are constantly boarding and exiting."
-Passenger Train,Are there specific stops or destinations involved?,"Yes, there are planned stops along the way."
-Passenger Train,Do people spend a lot of time looking out of windows?,"Yes, many passengers enjoy the view."
-Passenger Train,Is seating arranged closely together in this place?,"Yes, seating is quite compact here."
-Pirate Ship,Is this place associated with a historical period?,"Yes, it's closely tied to a certain era."
-Pirate Ship,Do you see a lot of nautical equipment here?,"Yes, there's a lot of sailing equipment on board."
-Pirate Ship,Is there a sense of adventure in this environment?,"Yes, adventure is a big part of life here."
-Pirate Ship,Do people wear unique or themed attire here?,"Yes, the attire is themed and unique."
-Pirate Ship,Is it common to experience rough conditions here?,"Yes, rough conditions are a regular challenge."
-Polar Station,Is this environment isolated or heavily populated?,It's very isolated with few people.
-Polar Station,Is temperature a big factor here?,"Yes, it's extremely cold here."
-Polar Station,Do people come here for research or relaxation?,Mostly for scientific research.
-Polar Station,Is this place indoors or outdoors?,"Mostly indoors, but some outdoor activities happen."
-Polar Station,Do you rely on special equipment to be here?,"Yes, special equipment is essential for survival."
+
+Blanton Museum,Do people usually move around slowly or quickly here?,"People tend to move slowly, taking time to observe the art."
+Blanton Museum,Is it quiet or noisy in this place?,"It's usually quiet, creating a calm environment."
+Blanton Museum,Do people take photos here often?,"Yes, photos are common but usually without flash."
+Blanton Museum,Is this place indoors or outdoors?,"Mostly indoors, but some areas may connect to open spaces."
+Blanton Museum,Do visitors come here alone or in groups?,"Both—some come to reflect alone, others visit with friends or classes."
+
+Harry Ransom Center,Do people come here to study or to explore?,"Mostly to explore exhibits and rare collections."
+Harry Ransom Center,Is the lighting bright or dim?,"The lighting is soft to protect artifacts."
+Harry Ransom Center,Are there a lot of rules to follow here?,"Yes, especially regarding touching exhibits."
+Harry Ransom Center,Do people talk much here?,"Not much, most people stay quiet or whisper."
+Harry Ransom Center,Do you spend more time standing or sitting here?,"Mostly standing while viewing displays."
+
+LBJ Library,Do you see a lot of historical displays here?,"Yes, the place is filled with presidential exhibits."
+LBJ Library,Is this a place for learning or entertainment?,"It's mainly educational but still engaging."
+LBJ Library,Is it busy or peaceful here?,"It’s calm but can get busy with school tours."
+LBJ Library,Do people usually take notes or pictures here?,"Many take photos or notes for research."
+LBJ Library,Do you need to buy tickets to enter?,"Yes, most exhibits require a ticket."
+
+Flawn Academic Center,Do people come here to study or socialize?,"Mostly to study, but some come to meet up with friends."
+Flawn Academic Center,Is it usually crowded?,"Yes, especially during class hours."
+Flawn Academic Center,Do you hear typing or talking more often?,"Typing and quiet conversations are common."
+Flawn Academic Center,Do people bring laptops here?,"Yes, nearly everyone has a laptop."
+Flawn Academic Center,Do you see more students or professors here?,"Mostly students using the space."
+
+Art Building and Museum,Do people create or observe art here?,"Both—some create, others observe."
+Art Building and Museum,Is it messy or organized?,"It’s a mix—art studios can get messy."
+Art Building and Museum,Do you hear tools or silence here?,"You often hear tools, brushes, and quiet discussion."
+Art Building and Museum,Do people wear special clothes here?,"Yes, artists may wear aprons or casual paint clothes."
+Art Building and Museum,Is it indoors or outdoors?,"Mostly indoors with some outdoor installations."
+
+Gates Dell Complex,Is this a quiet or collaborative space?,"It’s often buzzing with quiet collaboration."
+Gates Dell Complex,Do people work individually or in teams?,"Both, depending on the project."
+Gates Dell Complex,Do you see a lot of technology here?,"Yes, laptops and monitors everywhere."
+Gates Dell Complex,Is this space modern or traditional?,"Very modern, with lots of glass and tech."
+Gates Dell Complex,Do people spend long hours here?,"Yes, many stay for hours coding or studying."
+
+Christian Green Gallery,Do people observe or create here?,"They mostly observe rotating art exhibits."
+Christian Green Gallery,Is it brightly lit or softly lit?,"It’s softly lit to highlight artwork."
+Christian Green Gallery,Do people talk much here?,"Most people speak quietly."
+Christian Green Gallery,Are there seats available?,"A few, but most people stand and walk around."
+Christian Green Gallery,Is this place formal or casual?,"It’s calm and casual but respectful."
+
+Fine Arts Library,Do people talk or stay silent here?,"It’s usually very quiet."
+Fine Arts Library,Do people use computers here?,"Yes, many use computers for research."
+Fine Arts Library,Is the lighting bright or dim?,"It’s well-lit but not harsh."
+Fine Arts Library,Do people spend short or long periods here?,"Most stay for long stretches."
+Fine Arts Library,Do people come alone or in groups?,"Mostly alone, but sometimes in small study groups."
+
+Darrell K Royal Texas Memorial Stadium,Is this place loud or quiet?,"Extremely loud during games."
+Darrell K Royal Texas Memorial Stadium,Do people sit or stand here?,"Both—people often stand to cheer."
+Darrell K Royal Texas Memorial Stadium,Is it indoors or outdoors?,"It’s an outdoor stadium."
+Darrell K Royal Texas Memorial Stadium,Do people come here for sports or events?,"Mostly football and other large events."
+Darrell K Royal Texas Memorial Stadium,Do you see large crowds here?,"Yes, tens of thousands at a time."
+
+Gregory Gym,Do people come here to exercise or relax?,"Mainly to exercise."
+Gregory Gym,Is it noisy or quiet?,"It’s noisy with activity and music."
+Gregory Gym,Do people bring equipment here?,"Yes, most bring gym bags and water bottles."
+Gregory Gym,Is it crowded?,"It gets busy, especially in the evenings."
+Gregory Gym,Do people come alone or with friends?,"Both, some prefer solo workouts."
+
+Texas Memorial Museum,Is this place educational?,"Yes, it’s focused on science and history."
+Texas Memorial Museum,Do people take photos here?,"Yes, especially of fossils and exhibits."
+Texas Memorial Museum,Is it quiet or lively?,"Generally quiet with families and students exploring."
+Texas Memorial Museum,Are there many kids here?,"Yes, it’s popular for school trips."
+Texas Memorial Museum,Is it indoors or outdoors?,"Mostly indoors."
+
+UT Tower,Do people go inside or view it from outside?,"Mostly view it from outside, but tours go inside."
+UT Tower,Is it tall or short?,"Very tall—it’s a campus landmark."
+UT Tower,Do people take photos here?,"Yes, it’s one of the most photographed spots."
+UT Tower,Is it peaceful or busy around here?,"Peaceful during the day, lively during events."
+UT Tower,Is it symbolic?,"Yes, it’s an icon of the university."
+
+Littlefield Fountain,Is this place scenic?,"Yes, it’s very picturesque."
+Littlefield Fountain,Do people take photos here?,"Constantly, especially graduates."
+Littlefield Fountain,Is it noisy or quiet?,"Mostly quiet except for the water sound."
+Littlefield Fountain,Do people stay long here?,"Usually just for a few minutes."
+Littlefield Fountain,Is it indoors or outdoors?,"Outdoors, surrounded by campus paths."
+
+Turtle Pond,Do people come here to relax?,"Yes, it’s a calm place for breaks."
+Turtle Pond,Do you see animals here?,"Yes, turtles and fish are common."
+Turtle Pond,Is it shaded or sunny?,"A mix of shade and sunlight."
+Turtle Pond,Do people take photos here?,"Yes, especially of the turtles."
+Turtle Pond,Is it quiet?,"Yes, very peaceful and serene."
+
+The Drag,Do people shop or eat here?,"Both—lots of restaurants and stores."
+The Drag,Is it busy or calm?,"Usually very busy with students."
+The Drag,Do cars or pedestrians dominate?,"Mostly pedestrians, but cars pass through."
+The Drag,Is it indoors or outdoors?,"Outdoors along Guadalupe Street."
+The Drag,Do people spend much time here?,"People stop by frequently throughout the day."
+
+Norman Hackerman Building,Is it a science-related place?,"Yes, it’s mainly for chemistry and biology."
+Norman Hackerman Building,Do people wear lab coats here?,"Yes, in lab areas."
+Norman Hackerman Building,Is it quiet or noisy?,"Lecture halls are quiet; labs can be active."
+Norman Hackerman Building,Is it modern or old-fashioned?,"Very modern with updated labs."
+Norman Hackerman Building,Do you smell chemicals here?,"Sometimes faintly, in lab areas."
+
+WCP Student Activity Center,Do people come here to study or socialize?,"Both—it’s a major social hub."
+WCP Student Activity Center,Is it loud or quiet?,"Lively in public areas, quiet in lounges."
+WCP Student Activity Center,Are there food options here?,"Yes, several dining spots."
+WCP Student Activity Center,Do people stay long?,"Yes, many hang out between classes."
+WCP Student Activity Center,Is it indoors or outdoors?,"Mostly indoors."
+
+Texas State Capitol,Do people visit for work or tourism?,"Both—it’s an active government site and tourist spot."
+Texas State Capitol,Is it crowded?,"Yes, especially on weekdays and tours."
+Texas State Capitol,Is it formal or casual?,"Mostly formal with officials and visitors."
+Texas State Capitol,Is the architecture grand?,"Yes, it’s impressive and historic."
+Texas State Capitol,Do people take photos here?,"Constantly—it’s a major landmark."
+
+Mount Bonnell & Mayfield Park,Do people hike or relax here?,"Both—some climb, others rest and enjoy views."
+Mount Bonnell & Mayfield Park,Is it crowded?,"Can be busy on weekends."
+Mount Bonnell & Mayfield Park,Do you see animals here?,"Yes, especially peacocks at Mayfield."
+Mount Bonnell & Mayfield Park,Is it sunny or shaded?,"Mostly sunny with some shade."
+Mount Bonnell & Mayfield Park,Do people take photos here?,"Yes, especially at the overlook."
+
+Barton Springs,Do people swim here?,"Yes, it’s a natural spring-fed pool."
+Barton Springs,Is the water cold or warm?,"Always chilly, even in summer."
+Barton Springs,Do people relax or exercise here?,"Both—some swim laps, others sunbathe."
+Barton Springs,Is it natural or man-made?,"Natural spring, partially developed."
+Barton Springs,Is it crowded?,"Yes, especially on hot days."
+
+Zilker Park,Do people play sports or relax here?,"Both—many come for picnics and games."
+Zilker Park,Is it large or small?,"Very large, open and grassy."
+Zilker Park,Do people bring pets here?,"Yes, it’s popular for dogs."
+Zilker Park,Is it noisy?,"Can be lively with music and chatter."
+Zilker Park,Do people visit year-round?,"Yes, especially in nice weather."
+
+Lake Austin,Do people swim or boat here?,"Mostly boating and water sports."
+Lake Austin,Is it peaceful or busy?,"It varies—calm in mornings, busy weekends."
+Lake Austin,Do you hear nature or engines?,"Both—birds and boat motors."
+Lake Austin,Do people live near here?,"Yes, there are houses along the water."
+Lake Austin,Do people fish here?,"Yes, fishing is common."
+
+Lady Bird Johnson Wildflower Center,Do you see a lot of plants here?,"Yes, it’s filled with native Texas flora."
+Lady Bird Johnson Wildflower Center,Is it outdoors or indoors?,"Mostly outdoors."
+Lady Bird Johnson Wildflower Center,Do people come to learn or relax?,"Both—education and leisure."
+Lady Bird Johnson Wildflower Center,Is it quiet or full of activity?,"Mostly quiet with soft sounds of nature."
+Lady Bird Johnson Wildflower Center,Do you see many colors here?,"Yes, the flowers make it vibrant."
+
+Zilker Botanical Garden,Is this place usually quiet or noisy?,"It is generally quiet with natural sounds."
+Zilker Botanical Garden,Do people often come here to relax or explore?,"People usually come to relax and enjoy nature."
+Zilker Botanical Garden,Is there a lot of greenery and plants in this area?,"Yes, there are many plants and gardens."
+Zilker Botanical Garden,Do visitors usually walk around or stay in one spot?,"People mostly walk around to explore the gardens."
+Zilker Botanical Garden,Is this place open to the public?,"Yes, it is open to visitors."
+
+South Congress,Is this area busy or calm?,"It is usually busy with lots of people."
+South Congress,"Do people come here to shop, eat, or relax?","People come to shop, eat, and enjoy the area."
+South Congress,Are there many different types of shops and attractions?,"Yes, there is a variety of shops and attractions."
+South Congress,Do people usually walk around or stay in one place?,"People mostly walk around while exploring."
+South Congress,Is this area known for a lively atmosphere?,"Yes, it is known for being lively and vibrant."

@@ -18,8 +18,9 @@ class TestGame(unittest.IsolatedAsyncioTestCase):
     N_SPIES = 2
 
     @patch("game.AGENT_REGISTRY", {f"Agent{i}": MyAgent for i in range(10)})
-    @patch("game.random.choice", lambda x: Location.BEACH)
-    @patch("game.random.randint", lambda a, b: 0)
+    @patch("game.random.choice", lambda x: Location.LBJ_LIBRARY)
+    @patch("game.random.sample", lambda x, y: [0, 1])
+    @patch("game.random.randint", lambda x, y: 0)
     async def asyncSetUp(self):
         self.player_names = [f"Agent{i}" for i in range(10)]
         self.game = Game(NLP(), self.player_names, n_rounds=20, n_spies=self.N_SPIES)
@@ -28,8 +29,8 @@ class TestGame(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.game.n_players, 10)
         self.assertEqual(self.game.player_names, self.player_names)
         self.assertEqual(self.game.n_rounds, 20)
-        self.assertEqual(self.game.location, Location.BEACH)
-        self.assertEqual(sorted(self.game.spies), [0, 1])
+        self.assertEqual(self.game.location, Location.LBJ_LIBRARY)
+        self.assertEqual(self.game.spies, [0, 1])
         self.assertEqual(self.game.questioner, 0)
         self.assertEqual(len(self.game.players), 10)
         self.assertEqual(len(self.game.player_nlps), 10)
@@ -38,9 +39,9 @@ class TestGame(unittest.IsolatedAsyncioTestCase):
 
     async def test_scoring(self):
         self.game.players[0].guess_location = AsyncMock()
-        self.game.players[0].guess_location.return_value = Location.BEACH
+        self.game.players[0].guess_location.return_value = Location.LBJ_LIBRARY
         await self.game.play_()
-        self.assertEqual(self.game.game_state, GameState.SPY_GUESSED_RIGHT)
+        self.assertEqual(self.game.game_state, GameState.SPY1_GUESSED_RIGHT)
         target_scores = pd.Series(index=self.player_names, data=[0.0] * 10)
         for i in self.game.spies:
             target_scores[f"Agent{i}"] = 4.0
@@ -71,8 +72,9 @@ class TestGame(unittest.IsolatedAsyncioTestCase):
 
 class TestRound(unittest.IsolatedAsyncioTestCase):
     @patch("game.AGENT_REGISTRY", {f"Agent{i}": MyAgent for i in range(3)})
-    @patch("game.random.choice", lambda x: Location.BEACH)
-    @patch("game.random.randint", lambda a, b: 0)
+    @patch("game.random.choice", lambda x: Location.LBJ_LIBRARY)
+    @patch("game.random.sample", lambda x, y: [0, 1])
+    @patch("game.random.randint", lambda x, y: 0)
     async def asyncSetUp(self):
         # Setup mock players
         self.nlp = MagicMock(spec=NLP)  # Mock NLP object
@@ -98,6 +100,7 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
         answerer0 = reverse_pov(1, pov=0)
         p[answerer0].answer_question.return_value = "Answer0"
         p[0].guess_location.return_value = None
+        p[1].guess_location.return_value = None
         p[0].accuse_player.return_value = None
         p[1].accuse_player.return_value = None
         p[2].accuse_player.return_value = None
@@ -122,7 +125,7 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
             else:
                 p[i].answer_question.assert_not_called()
         p[0].guess_location.assert_awaited_once()
-        p[1].guess_location.assert_not_called()
+        p[1].guess_location.assert_awaited_once()
         p[2].guess_location.assert_not_called()
         for i in range(3):
             p[i].analyze_response.assert_awaited_once_with(
@@ -139,21 +142,20 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
         p[0].ask_question.return_value = (1, "Question0")
         answerer0 = reverse_pov(1, pov=0)
         p[answerer0].answer_question.return_value = "Answer0"
-        for i in self.game.spies:
-            p[i].guess_location.return_value = Location.BEACH
-            p[i].accuse_player.return_value = None
-        # TODO we might need to adjust the indices for non spies below
+        p[0].guess_location.return_value = Location.LBJ_LIBRARY
+        p[1].guess_location.return_value = None
+        p[0].accuse_player.return_value = None
         p[1].accuse_player.return_value = add_pov(0, 1)
         p[2].accuse_player.return_value = add_pov(0, 2)
 
         await self.round.play()
 
-        self.assertEqual(self.game.game_state, GameState.SPY_GUESSED_RIGHT)
+        self.assertEqual(self.game.game_state, GameState.SPY1_GUESSED_RIGHT)
         self.assertEqual(self.round.questioner, 0)
         self.assertEqual(self.round.question, "Question0")
         self.assertEqual(self.round.answerer, answerer0)
         self.assertEqual(self.round.answer, "Answer0")
-        self.assertEqual(self.round.spy_guess, Location.BEACH)
+        self.assertEqual(self.round.spy_guess, Location.LBJ_LIBRARY)
         self.assertFalse(hasattr(self.round, "player_votes"))
         self.assertFalse(hasattr(self.round, "indicted"))
 
@@ -166,7 +168,7 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
             else:
                 p[i].answer_question.assert_not_called()
         p[0].guess_location.assert_awaited_once()
-        p[1].guess_location.assert_not_called()
+        p[1].guess_location.assert_awaited_once()
         p[2].guess_location.assert_not_called()
         for i in range(3):
             p[i].analyze_response.assert_awaited_once_with(
@@ -183,19 +185,20 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
         p[0].ask_question.return_value = (1, "Question0")
         answerer0 = reverse_pov(1, pov=0)
         p[answerer0].answer_question.return_value = "Answer0"
-        p[0].guess_location.return_value = Location.AIRPLANE
+        p[0].guess_location.return_value = Location.BLANTON_MUSEUM
+        p[1].guess_location.return_value = None
         p[0].accuse_player.return_value = None
         p[1].accuse_player.return_value = add_pov(0, 1)
         p[2].accuse_player.return_value = add_pov(0, 2)
 
         await self.round.play()
 
-        self.assertEqual(self.game.game_state, GameState.SPY_GUESSED_WRONG)
+        self.assertEqual(self.game.game_state, GameState.SPY1_GUESSED_WRONG)
         self.assertEqual(self.round.questioner, 0)
         self.assertEqual(self.round.question, "Question0")
         self.assertEqual(self.round.answerer, answerer0)
         self.assertEqual(self.round.answer, "Answer0")
-        self.assertEqual(self.round.spy_guess, Location.AIRPLANE)
+        self.assertEqual(self.round.spy_guess, Location.BLANTON_MUSEUM)
         self.assertFalse(hasattr(self.round, "player_votes"))
         self.assertFalse(hasattr(self.round, "indicted"))
 
@@ -208,7 +211,7 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
             else:
                 p[i].answer_question.assert_not_called()
         p[0].guess_location.assert_awaited_once()
-        p[1].guess_location.assert_not_called()
+        p[1].guess_location.assert_awaited_once()
         p[2].guess_location.assert_not_called()
         for i in range(3):
             p[i].analyze_response.assert_awaited_once_with(
@@ -226,6 +229,7 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
         answerer0 = reverse_pov(1, pov=0)
         p[answerer0].answer_question.return_value = "Answer0"
         p[0].guess_location.return_value = None
+        p[1].guess_location.return_value = None
         p[0].accuse_player.return_value = None
         p[1].accuse_player.return_value = add_pov(0, 1)
         p[2].accuse_player.return_value = add_pov(1, 2)
@@ -250,7 +254,7 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
             else:
                 p[i].answer_question.assert_not_called()
         p[0].guess_location.assert_awaited_once()
-        p[1].guess_location.assert_not_called()
+        p[1].guess_location.assert_awaited_once()
         p[2].guess_location.assert_not_called()
         for i in range(3):
             p[i].analyze_response.assert_awaited_once_with(
@@ -271,13 +275,14 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
         answerer0 = reverse_pov(1, pov=0)
         p[answerer0].answer_question.return_value = "Answer0"
         p[0].guess_location.return_value = None
+        p[1].guess_location.return_value = None
         p[0].accuse_player.return_value = add_pov(1, 0)
         p[1].accuse_player.return_value = add_pov(0, 1)
         p[2].accuse_player.return_value = add_pov(0, 2)
 
         await self.round.play()
 
-        self.assertEqual(self.game.game_state, GameState.SPY_INDICTED)
+        self.assertEqual(self.game.game_state, GameState.SPY1_INDICTED)
         self.assertEqual(self.round.questioner, 0)
         self.assertEqual(self.round.question, "Question0")
         self.assertEqual(self.round.answerer, answerer0)
@@ -296,7 +301,7 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
             else:
                 p[i].answer_question.assert_not_called()
         p[0].guess_location.assert_awaited_once()
-        p[1].guess_location.assert_not_called()
+        p[1].guess_location.assert_awaited_once()
         p[2].guess_location.assert_not_called()
         for i in range(3):
             p[i].analyze_response.assert_awaited_once_with(
@@ -314,6 +319,7 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
         answerer0 = reverse_pov(1, pov=0)
         p[answerer0].answer_question.return_value = "Answer0"
         p[0].guess_location.return_value = None
+        p[1].guess_location.return_value = None
         p[0].accuse_player.return_value = add_pov(2, 0)
         p[1].accuse_player.return_value = add_pov(2, 1)
         p[2].accuse_player.return_value = add_pov(0, 2)
@@ -338,7 +344,7 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
             else:
                 p[i].answer_question.assert_not_called()
         p[0].guess_location.assert_awaited_once()
-        p[1].guess_location.assert_not_called()
+        p[1].guess_location.assert_awaited_once()
         p[2].guess_location.assert_not_called()
         for i in range(3):
             p[i].analyze_response.assert_awaited_once_with(
@@ -349,11 +355,6 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
 
 
 class TestUtil(unittest.TestCase):
-    def test_redact(self):
-        text = "The location is the beach"
-        redacted_text = redact(text, Location.BEACH)
-        self.assertEqual(redacted_text, "The location is the <REDACTED>")
-
     def test_count_votes(self):
         votes = [0, 1, 1, 0, None]
         self.assertEqual(count_votes(votes, len(votes)), None)
@@ -380,30 +381,30 @@ class TestNLP(unittest.IsolatedAsyncioTestCase):
         self.llm.prompt = AsyncMock()
         self.llm.prompt.return_value = "".join(["test"] * 100)
         self.embedding.get_embeddings = AsyncMock()
-        self.embedding.get_embeddings.return_value = np.ones(768)
+        self.embedding.get_embeddings.return_value = np.ones(3072)
 
         output = await self.proxy.prompt_llm("How are you?")
-        self.assertEqual(output, "".join(["test"] * 100))
+        self.assertEqual(output, "".join(["test"] * 100) + " <out of tokens>")
 
         # Test that limit has been reached
         output = await self.proxy.prompt_llm("Hi")
-        self.assertEqual(output, "")
+        self.assertEqual(output, "<out of tokens>")
         emb = await self.proxy.get_embeddings("Hello there")
-        self.assertTrue(all(emb == np.zeros(768)))
+        self.assertTrue(all(emb == np.zeros(3072)))
 
         # Reset
         self.counter.reset_token_counter()
         output = await self.proxy.prompt_llm("Hi")
-        self.assertEqual(output, "".join(["test"] * 100))
+        self.assertEqual(output, "".join(["test"] * 100) + " <out of tokens>")
         emb = await self.proxy.get_embeddings("Hello there")
-        self.assertTrue(all(emb == np.zeros(768)))
+        self.assertTrue(all(emb == np.zeros(3072)))
 
         # Reset
         self.counter.reset_token_counter()
         emb = await self.proxy.get_embeddings("Hello there")
-        self.assertTrue(all(emb == np.ones(768)))
+        self.assertTrue(all(emb == np.ones(3072)))
         output = await self.proxy.prompt_llm("Hi")
-        self.assertEqual(output, "".join(["test"] * 100))
+        self.assertEqual(output, "".join(["test"] * 100) + " <out of tokens>")
 
     async def test_proxy(self):
         self.assertFalse(hasattr(self.proxy, "nlp"))

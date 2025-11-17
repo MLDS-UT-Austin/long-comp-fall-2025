@@ -40,7 +40,7 @@ class Visualization:
         self.screen.blit(text_surface, pygame.Vector2(20, 20))
 
         # Display spy and player images on self.screen
-        for i in range(4):
+        for i in range(len(self.player_names)):
             img = SPY_IMG if i in self.spy_indices else PLAYER_IMG
             self.screen.blit(img, self._player_pos(i) + pygame.Vector2(-50, -50))
 
@@ -115,7 +115,7 @@ class Visualization:
 
 
 if __name__ == "__main__":
-    vis = Visualization(["Player 1", "Player 2", "Player 3", "Player 4"], 0, "Beach")
+    vis = Visualization(["Player 1", "Player 2", "Player 3", "Player 4"], [0, 2], "Blanton Museum")
     while True:
         for i in range(4):
             vis.render_text(i, "This is too long to fit on one line. " * 20)

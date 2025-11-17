@@ -1,0 +1,1 @@
+rsync -av --exclude='.git' --exclude='tests.py' --exclude='temp.py' --exclude='copy_to_classroom.sh' --exclude='.mypy_cache' --exclude='.gitignore' --exclude='clone.py' ./ ../long-comp-fall-2025-classroom
