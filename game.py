@@ -1,13 +1,16 @@
 import asyncio
-import random
 import hashlib
+import random
+import tempfile
 from enum import Enum
 from functools import lru_cache
 from itertools import chain
+from pathlib import Path
 
+import numpy as np  # type: ignore
 import pandas as pd  # type: ignore
-import pygame
 import soundfile as sf  # type: ignore
+from moviepy.editor import AudioFileClip, VideoFileClip  # type: ignore
 from tqdm import tqdm  # type: ignore
 
 from agent import AGENT_REGISTRY, Agent
@@ -22,11 +25,11 @@ from visualizations import Visualization
 
 def deterministic_choice(seq, seed_value):
     """Deterministically choose an element from a sequence based on a seed value.
-    
+
     Args:
         seq: A sequence to choose from
         seed_value: A value to use as a seed for deterministic selection
-        
+
     Returns:
         A deterministically chosen element from the sequence
     """
@@ -252,7 +255,9 @@ class Game:
                 self.game_state.value,
             )
             seed_no_one = f"{seed_base}_no_one_indicted"
-            no_one_indicted_msg = deterministic_choice(NO_ONE_INDICTED_RESPONSE, seed_no_one)
+            no_one_indicted_msg = deterministic_choice(
+                NO_ONE_INDICTED_RESPONSE, seed_no_one
+            )
             seed_player = f"{seed_base}_no_one_player"
             player = deterministic_choice(
                 list(set(range(self.n_players)) - set(self.spies)), seed_player
@@ -288,39 +293,130 @@ class Game:
         ):
             round.pregenerate_audio()
 
-    def render(self):
+    def render(
+        self,
+        output_path: str,
+        *,
+        fps: int = 30,
+        resolution: tuple[int, int] = (1920, 1080),
+    ):
+        """
+        Render the full game replay directly to an MP4 file with audio.
+
+        Args:
+            output_path: Destination MP4 path.
+            fps: Video frames per second.
+            resolution: Width/height of the rendered surface.
+        """
+        assert self.rounds, "game has not been played yet"
         assert self.rounds[0].audio, "need to pregenerate audio first"
 
-        """Visualizes the game and plays the audio"""
-        # set audio output to system default
-        os.environ["SDL_AUDIODRIVER"] = "coreaudio"
+        target = Path(output_path)
+        target.parent.mkdir(parents=True, exist_ok=True)
 
-        # setup audio
         sr = self.rounds[0].audio[0][2]
-        pygame.mixer.pre_init(frequency=sr, channels=1, allowedchanges=0)
-        pygame.init()
+        silence_samples = sr // 2  # match historical padding
+        silence_ms = int((silence_samples / sr) * 1000)
 
-        # init visualization
-        vis = Visualization(self.player_names, self.spies, self.location.value)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_dir_path = Path(tmp_dir)
+            silent_video_path = tmp_dir_path / "video.mp4"
+            audio_path = tmp_dir_path / "audio.wav"
 
-        for round in self.rounds:
-            round.render(vis)
+            vis = Visualization(
+                self.player_names,
+                self.spies,
+                self.location.value,
+                output_path=str(silent_video_path),
+                resolution=resolution,
+                fps=fps,
+            )
+            try:
+                for round in self.rounds:
+                    round.render(vis, silence_after_ms=silence_ms)
+            finally:
+                vis.close()
 
-        # close pygame
-        del vis
+            combined_audio, sr = self._combine_audio_track(silence_samples)
+            sf.write(audio_path, combined_audio, sr)
+            self._mux_audio_video(
+                str(silent_video_path),
+                str(audio_path),
+                str(target),
+                fps=fps,
+            )
 
     def save_audio(self, path: str):
         """saves the audio to a path"""
-        self.rounds[0].audio, "need to pregenerate audio"
+        assert self.rounds, "game has not been played yet"
+        assert self.rounds[0].audio, "need to pregenerate audio first"
         sr = self.rounds[0].audio[0][2]
-        audio_list = [a for round in self.rounds for _, a, _ in round.audio]
-        audio_list = [np.pad(a, (0, sr // 2)) for a in audio_list]
-        comb_audio = np.concatenate(audio_list)
-        # save audio to path
-        sf.write(path, comb_audio, sr)
+        combined_audio, sr = self._combine_audio_track(sr // 2)
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        sf.write(path, combined_audio, sr)
+
+    def _combine_audio_track(
+        self, trailing_silence_samples: int
+    ) -> tuple[np.ndarray, int]:
+        """Concatenate round audio with optional trailing silence after each clip."""
+        assert self.rounds, "game has not been played yet"
+        assert self.rounds[0].audio, "need to pregenerate audio first"
+
+        sr = self.rounds[0].audio[0][2]
+        trailing_silence_samples = max(0, trailing_silence_samples)
+        silence = (
+            np.zeros(trailing_silence_samples, dtype=np.float32)
+            if trailing_silence_samples
+            else None
+        )
+
+        segments: list[np.ndarray] = []
+        for round in self.rounds:
+            for _, clip, _ in round.audio:
+                audio_clip = clip.astype(np.float32, copy=False)
+                if silence is not None:
+                    audio_clip = np.concatenate([audio_clip, silence])
+                segments.append(audio_clip)
+
+        if not segments:
+            return np.zeros(1, dtype=np.float32), sr
+
+        combined_audio = np.concatenate(segments)
+
+        # **ADD THIS**: Normalize to prevent clipping
+        max_val = np.abs(combined_audio).max()
+        if max_val > 0:
+            combined_audio = combined_audio / max_val * 0.95  # Leave 5% headroom
+
+        return combined_audio, sr
+
+    def _mux_audio_video(
+        self, video_path: str, audio_path: str, output_path: str, *, fps: int
+    ):
+        import subprocess
+
+        # Use ffmpeg directly for more reliable muxing
+        cmd = [
+            "ffmpeg",
+            "-y",  # -y to overwrite
+            "-i",
+            video_path,
+            "-i",
+            audio_path,
+            "-c:v",
+            "copy",  # Copy video without re-encoding
+            "-c:a",
+            "aac",  # Encode audio as AAC
+            "-shortest",  # Match shortest stream duration
+            output_path,
+        ]
+
+        subprocess.run(cmd, check=True, capture_output=True)
 
     def __str__(self):
-        return f"Location: {self.location}, Spies: {self.spies}, Ending: {self.game_state}"
+        return (
+            f"Location: {self.location}, Spies: {self.spies}, Ending: {self.game_state}"
+        )
 
 
 class Round:
@@ -392,10 +488,10 @@ class Round:
             guess = await game.players[spy].guess_location()
             assert guess is None or isinstance(guess, Location)
             spy_guesses.append((spy, guess))
-        
+
         # Randomize order of spy guesses
         random.shuffle(spy_guesses)
-        
+
         # Check guesses in random order
         for spy, guess in spy_guesses:
             if guess == game.location:
@@ -416,7 +512,7 @@ class Round:
                 game.guessing_spy = spy
                 self.spy_guess = guess
                 return
-        
+
         # No spy guessed
         self.spy_guess = None
 
@@ -478,7 +574,7 @@ class Round:
             self.answer,
             self.spy_guess.value if self.spy_guess is not None else None,
             game.indicted_spy,
-            tuple(self.player_votes) if hasattr(self, 'player_votes') else None,
+            tuple(self.player_votes) if hasattr(self, "player_votes") else None,
             game.guessing_spy if game.guessing_spy is not None else None,
         )
 
@@ -486,35 +582,45 @@ class Round:
         if self.spy_guess is not None:
             spy = random.choice(game.spies)
             # spy: I am the spy. Was it the {location}?
-            seed_msg = f"{seed_base}_spy_reveal_{game.guessing_spy}_{self.spy_guess.value}"
+            seed_msg = (
+                f"{seed_base}_spy_reveal_{game.guessing_spy}_{self.spy_guess.value}"
+            )
             msg = deterministic_choice(SPY_REVEAL_AND_GUESS, seed_msg).format(
                 location=self.spy_guess.value
             )
-            output.append((game.guessing_spy, msg))
+            spying_player = game.guessing_spy if game.guessing_spy is not None else spy
+            output.append((spying_player, msg))
             seed_responder = f"{seed_base}_responder_{game.guessing_spy}"
             responder = deterministic_choice(
                 list(set(range(game.n_players)) - set(game.spies)), seed_responder
             )
-            if game.game_state in [GameState.SPY1_GUESSED_RIGHT, GameState.SPY2_GUESSED_RIGHT]:
+            if game.game_state in [
+                GameState.SPY1_GUESSED_RIGHT,
+                GameState.SPY2_GUESSED_RIGHT,
+            ]:
                 # random nonspy: yes that is right
                 seed_response = f"{seed_base}_guess_right_{responder}"
                 msg = deterministic_choice(SPY_GUESS_RIGHT_RESPONSE, seed_response)
             else:
                 # random nonspy: no, it was the {location}
                 seed_response = f"{seed_base}_guess_wrong_{responder}"
-                msg = deterministic_choice(SPY_GUESS_WRONG_RESPONSE, seed_response).format(
-                    location=game.location.value
-                )
+                msg = deterministic_choice(
+                    SPY_GUESS_WRONG_RESPONSE, seed_response
+                ).format(location=game.location.value)
             output.append((responder, msg))
 
         # indictment
         elif self.indicted is not None:
             # one of the accusers: "I think it's player {spy} are you the spy?"
-            accusers = [i for i, x in enumerate(self.player_votes) if x == self.indicted]
+            accusers = [
+                i for i, x in enumerate(self.player_votes) if x == self.indicted
+            ]
             seed_accuser = f"{seed_base}_accuser_{self.indicted}"
             accuser = deterministic_choice(accusers, seed_accuser)
             seed_accusation = f"{seed_base}_accusation_{accuser}"
-            msg = deterministic_choice(ACCUSATION, seed_accusation).format(spy=names[self.indicted])
+            msg = deterministic_choice(ACCUSATION, seed_accusation).format(
+                spy=names[self.indicted]
+            )
             output.append((accuser, msg))
             if game.game_state in [GameState.SPY1_INDICTED, GameState.SPY2_INDICTED]:
                 # spy: I am the spy
@@ -543,16 +649,14 @@ class Round:
             audio, sr = text_to_speech(message, voice, ps)
             self.audio.append((player, audio, sr))
 
-    def render(self, vis: Visualization):
+    def render(self, vis: Visualization, silence_after_ms: int = 0):
         conv = self.get_conversation()
         # render the round
-        self.audio, "need to pregenerate audio"
-        # game = self.game
-        # print(game.window)
+        assert self.audio, "need to pregenerate audio first"
         for voice, (player_id, msg) in zip(self.audio, conv):
             vis.render_text(player_id, msg)
-            _, audio, _ = voice
-            sound = pygame.sndarray.make_sound(audio)
-            sound.play()
-            # Use wait_and_record to capture frames during audio playback
-            vis.wait_and_record(int(sound.get_length() * 1000))
+            _, audio, sr = voice
+            duration_ms = int(np.ceil(len(audio) / sr * 1000))
+            vis.record_duration(duration_ms)
+            if silence_after_ms > 0:
+                vis.record_duration(silence_after_ms)

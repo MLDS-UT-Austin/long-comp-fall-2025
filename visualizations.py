@@ -1,10 +1,12 @@
 import math
 import os
-from datetime import datetime
+from pathlib import Path
+
+os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
+os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
 
 import cv2
 import pygame
-from pygame.locals import *
 
 # This file is for internal use to render games ####################################
 
@@ -20,16 +22,25 @@ PLAYER_IMG = pygame.transform.scale(PLAYER_IMG, (100, 100))
 
 
 class Visualization:
-    def __init__(self, player_names: list[str], spy_indices: list[int], location: str):
+    def __init__(
+        self,
+        player_names: list[str],
+        spy_indices: list[int],
+        location: str,
+        *,
+        output_path: str,
+        resolution: tuple[int, int] = (1920, 1080),
+        fps: float = 30.0,
+    ):
         self.player_names = player_names
         self.spy_indices = spy_indices
         self.location = location
+        self.resolution = resolution
+        self.fps = fps
 
-        # Initialize pygame
         pygame.init()
-
-        # Screen dimensions
-        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        pygame.font.init()
+        self.surface = pygame.Surface(self.resolution)
 
         # Font
         self.font = pygame.font.Font(
@@ -37,67 +48,55 @@ class Visualization:
         )  # None for default font, 36 for font size
 
         # Initialize video recording
-        self._setup_video_recording()
+        self.video_writer: cv2.VideoWriter | None = None
+        self.video_path: str | None = None
+        self.frame_count = 0
+        self.recording_active = False
+        self._setup_video_recording(output_path)
 
     def __del__(self):
+        self.close()
+
+    def close(self):
         self._stop_recording()
         pygame.quit()
 
-    def _setup_video_recording(self):
-        """Initialize video recording with timestamped filename."""
-        # Create recordings directory if it doesn't exist
-        os.makedirs("recordings", exist_ok=True)
-
-        # Generate timestamped filename
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.video_filename = os.path.join("recordings", f"game_{timestamp}.mp4")
-
-        # Get screen dimensions
-        width, height = self.screen.get_size()
-
+    def _setup_video_recording(self, output_path: str):
+        """Initialize video recording to write directly to the provided path."""
+        target = Path(output_path)
+        target.parent.mkdir(parents=True, exist_ok=True)
         # Initialize video writer (using mp4v codec for MP4 format)
-        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+        fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # type: ignore[attr-defined]
         self.video_writer = cv2.VideoWriter(
-            self.video_filename,
+            str(target),
             fourcc,
-            30.0,  # 30 FPS for smooth video
-            (width, height),
+            self.fps,
+            self.resolution,
         )
 
+        self.video_path = str(target)
         self.recording_active = True
-        self.frame_count = 0
-
-        print(f"Recording started: {self.video_filename}")
 
     def _stop_recording(self):
         """Stop video recording and save the file."""
         if hasattr(self, "video_writer") and self.video_writer is not None:
             self.recording_active = False
             self.video_writer.release()
-            print(f"Recording saved: {self.video_filename}")
             self.video_writer = None
+            self.video_path = None
 
     def stop_recording(self):
         """Public method to manually stop recording before object destruction."""
         self._stop_recording()
 
-    def wait_and_record(self, duration_ms):
-        """Wait for a duration while continuously recording the current frame.
-
-        This should be used instead of pygame.time.wait() to ensure frames are
-        captured during wait periods.
-
-        Args:
-            duration_ms: Duration to wait in milliseconds
-        """
-        if self.recording_active and hasattr(self, "video_writer"):
-            # Capture the current frame for the entire duration
-            self._capture_frame(duration_ms=duration_ms)
-        # Still perform the actual wait
-        pygame.time.wait(duration_ms)
+    def record_duration(self, duration_ms: int):
+        """Record the current frame for the requested duration without waiting in real time."""
+        if duration_ms <= 0:
+            duration_ms = int(1000 / self.fps)
+        self._capture_frame(duration_ms=duration_ms)
 
     def _capture_frame(self, duration_ms=0):
-        """Capture the current pygame screen as a video frame.
+        """Capture the current pygame surface as a video frame.
 
         Args:
             duration_ms: How long this frame should be displayed (in milliseconds).
@@ -109,7 +108,7 @@ class Visualization:
             and self.recording_active
         ):
             # Get the pygame surface as a string buffer
-            frame = pygame.surfarray.array3d(self.screen)
+            frame = pygame.surfarray.array3d(self.surface)
             # Convert from (width, height, 3) to (height, width, 3)
             frame = frame.transpose([1, 0, 2])
             # Convert RGB to BGR for OpenCV
@@ -117,8 +116,8 @@ class Visualization:
 
             # Calculate how many times to write this frame based on duration
             if duration_ms > 0:
-                # At 30 FPS, each frame is ~33ms. Write frame multiple times for the duration.
-                num_frames = max(1, int(duration_ms / 33.33))
+                frame_duration_ms = 1000 / self.fps
+                num_frames = max(1, int(math.ceil(duration_ms / frame_duration_ms)))
             else:
                 num_frames = 1
 
@@ -127,14 +126,14 @@ class Visualization:
                 self.frame_count += 1
 
     def render_text(self, player_idx: int, msg: str):
-        self.screen.fill(WHITE)
+        self.surface.fill(WHITE)
         text_surface = self.font.render(f"Location: {self.location}", True, BLACK)
-        self.screen.blit(text_surface, pygame.Vector2(20, 20))
+        self.surface.blit(text_surface, pygame.Vector2(20, 20))
 
         # Display spy and player images on self.screen
         for i in range(len(self.player_names)):
             img = SPY_IMG if i in self.spy_indices else PLAYER_IMG
-            self.screen.blit(img, self._player_pos(i) + pygame.Vector2(-50, -50))
+            self.surface.blit(img, self._player_pos(i) + pygame.Vector2(-50, -50))
 
         # Display player labels
         for i, player_name in enumerate(self.player_names):
@@ -142,9 +141,6 @@ class Visualization:
 
         # Display the current dialogue
         self._render_wrapped_text(msg, self._text_pos(player_idx))
-
-        # flip() the display to put your work on self.screen
-        pygame.display.flip()
 
     # Function to wrap text
     def _wrap_text(self, text, font, max_width):
@@ -178,15 +174,15 @@ class Visualization:
                 -self.font.size(line)[0] / 2,
                 i * (self.font.get_linesize() + line_spacing),
             )
-            self.screen.blit(text_surface, line_position)
+            self.surface.blit(text_surface, line_position)
 
     @property
     def _screen_width(self):
-        return self.screen.get_size()[0]
+        return self.surface.get_size()[0]
 
     @property
     def _screen_height(self):
-        return self.screen.get_size()[1]
+        return self.surface.get_size()[1]
 
     def _pos(self, player_idx: int, offset: int):
         cols = 3
@@ -210,31 +206,3 @@ class Visualization:
 
     def _text_pos(self, player_idx: int):
         return self._pos(player_idx, 0)
-
-
-if __name__ == "__main__":
-    vis = Visualization(
-        [
-            "Player 1",
-            "Player 2",
-            "Player 3",
-            "Player 4",
-            "Player 5",
-            "Player 6",
-        ],
-        [1, 4],
-        "Blanton Museum",
-    )
-
-    # Run a short test (3 rounds, ~18 seconds total)
-    for round_num in range(3):
-        for i in range(6):
-            vis.render_text(
-                i,
-                f"Round {round_num + 1}: Player {i + 1} is speaking. This is a test message.",
-            )
-            vis.wait_and_record(1500)  # Wait 1.5 seconds and record
-
-    # Clean up and save video
-    del vis
-    print("\nTest complete! Check the 'recordings' folder for the saved video.")
