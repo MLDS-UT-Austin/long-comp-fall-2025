@@ -47,17 +47,23 @@ class Simulation:
                 print(f"Agent {name} failed validation: {e}")
                 raise e
 
-    def run(self, n_games: int = 1):
+    def run(
+        self,
+        n_games: int = 1,
+        sampled_agent_names_and_spies: list[tuple[list[str], list[int]]] | None = None,
+    ):
         """Run multiple games in parallel and adds the results to self.games
         Args:
             n_games (int, optional): number of games to run
             agent_names (list[str] | None, optional): names of agent classes to use
+            sampled_agent_names_and_spies: list of tuples containing the agents in each game and the spy indices. If None, agents will be randomly sampled. Defaults to None.
         """
         assert self.agent_names is not None
-        # Randomly sample agent classes and the spy to play in each game
-        sampled_agent_names_and_spies = sample_agents(
-            self.agent_names, self.team_size, n_games
-        )
+        if not sampled_agent_names_and_spies:
+            # Randomly sample agent classes and the spy to play in each game
+            sampled_agent_names_and_spies = sample_agents(
+                self.agent_names, self.team_size, n_games
+            )
 
         # Set up progress bar
         tqdm_bar = tqdm(
@@ -168,9 +174,12 @@ class Simulation:
         return pd.Series(c)
 
     def _get_animation(
-        self, duration: int = 10, fps: int = 30
+        self, duration: int = 10, fps: int = 30, scores: pd.DataFrame | None = None
     ) -> animation.FuncAnimation:
-        df = self.get_scores()
+        if scores is not None:
+            df = scores
+        else:
+            df = self.get_scores()
 
         for col in df.columns:
             # Use expanding mean times index instead of cumsum to correctly handle NaNs
@@ -190,7 +199,10 @@ class Simulation:
             percent_complete = animation_i / (duration * fps)
 
             # adjust growth rate here to be non-linear if desired
-            i = int(min(percent_complete, 1) * len(df))
+            adj_percent_complete = 0.03 * percent_complete + 0.97 * percent_complete**4.0 + 0.001
+            # print(f" {percent_complete:0.2f} complete --> {adj_percent_complete:0.2f} adjusted")
+
+            i = int(min(adj_percent_complete, 1) * len(df))
 
             x = df.index[:i]
             for j, line in enumerate(lines):
@@ -214,14 +226,14 @@ class Simulation:
 
         return ani
 
-    def visualize_scores(self, duration: int = 10, fps: int = 30):
+    def visualize_scores(self, duration: int = 10, fps: int = 30, scores: pd.DataFrame | None = None):
         """Plays visualization of the scores of all agents over time"""
-        ani = self._get_animation(duration, fps)
+        ani = self._get_animation(duration, fps, scores)
 
         plt.show()
 
-    def save_visualization(self, filepath, duration: int = 10, fps: int = 30):
+    def save_visualization(self, filepath, duration: int = 10, fps: int = 30, scores: pd.DataFrame | None = None):
         """Saves visualization of the scores of all agents over time to a file"""
-        ani = self._get_animation(duration, fps)
+        ani = self._get_animation(duration, fps, scores)
 
         ani.save(filepath, writer="ffmpeg")
