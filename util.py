@@ -46,7 +46,7 @@ def sample_agents(
     n_games: int,
     n_spies: int = 1,
     verbose: bool = False,
-    max_same_agent: int = 2,
+    max_same_agent: int = 1,
 ) -> list[tuple[list[str], list[int]]]:
     """Sample agents for a game, ensuring fairness for both game count and spy count
 
