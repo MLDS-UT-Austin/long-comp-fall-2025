@@ -1,3 +1,4 @@
+import asyncio
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -405,6 +406,82 @@ class TestNLP(unittest.IsolatedAsyncioTestCase):
     async def test_proxy(self):
         self.assertFalse(hasattr(self.proxy, "nlp"))
         self.assertFalse(hasattr(self.proxy, "reset_token_counter"))
+
+
+class TestConversationDeterminism(unittest.IsolatedAsyncioTestCase):
+    """Test that get_conversation() returns deterministic results"""
+
+    @patch("game.AGENT_REGISTRY", {f"Agent{i}": MyAgent for i in range(5)})
+    @patch("game.random.choice", lambda x: Location.LBJ_LIBRARY)
+    @patch("game.random.sample", lambda x, y: [0, 1])
+    @patch("game.random.randint", lambda x, y: 0)
+    async def asyncSetUp(self):
+        self.player_names = [f"Agent{i}" for i in range(5)]
+        self.game = Game(NLP(), self.player_names, n_rounds=5)
+        await self.game.play_()
+
+    async def test_game_conversation_determinism(self):
+        """Test that Game.get_conversation() returns the same result multiple times"""
+        # Clear cache to ensure we're testing determinism, not just caching
+        self.game.get_conversation.cache_clear()
+        
+        # Get conversation multiple times
+        conv1 = self.game.get_conversation()
+        conv2 = self.game.get_conversation()
+        conv3 = self.game.get_conversation()
+        
+        # All should be identical
+        pd.testing.assert_frame_equal(conv1, conv2)
+        pd.testing.assert_frame_equal(conv2, conv3)
+        
+        # Clear cache and get again - should still be the same
+        self.game.get_conversation.cache_clear()
+        conv4 = self.game.get_conversation()
+        pd.testing.assert_frame_equal(conv1, conv4)
+
+    async def test_round_conversation_determinism(self):
+        """Test that Round.get_conversation() returns the same result multiple times"""
+        if len(self.game.rounds) == 0:
+            self.skipTest("No rounds to test")
+        
+        round = self.game.rounds[0]
+        
+        # Clear cache to ensure we're testing determinism, not just caching
+        round.get_conversation.cache_clear()
+        
+        # Get conversation multiple times
+        conv1 = round.get_conversation()
+        conv2 = round.get_conversation()
+        conv3 = round.get_conversation()
+        
+        # All should be identical
+        self.assertEqual(conv1, conv2)
+        self.assertEqual(conv2, conv3)
+        
+        # Clear cache and get again - should still be the same
+        round.get_conversation.cache_clear()
+        conv4 = round.get_conversation()
+        self.assertEqual(conv1, conv4)
+
+    async def test_conversation_consistency_across_calls(self):
+        """Test that conversation is consistent when called from different contexts"""
+        # Get conversation
+        conv1 = self.game.get_conversation()
+        
+        # Clear cache
+        self.game.get_conversation.cache_clear()
+        
+        # Get again - should be identical
+        conv2 = self.game.get_conversation()
+        pd.testing.assert_frame_equal(conv1, conv2)
+        
+        # Test that individual rounds are also consistent
+        for round in self.game.rounds:
+            round.get_conversation.cache_clear()
+            round_conv1 = round.get_conversation()
+            round.get_conversation.cache_clear()
+            round_conv2 = round.get_conversation()
+            self.assertEqual(round_conv1, round_conv2)
 
 
 if __name__ == "__main__":
