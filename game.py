@@ -496,4 +496,5 @@ class Round:
             _, audio, _ = voice
             sound = pygame.sndarray.make_sound(audio)
             sound.play()
-            pygame.time.wait(int(sound.get_length() * 1000))
+            # Use wait_and_record to capture frames during audio playback
+            vis.wait_and_record(int(sound.get_length() * 1000))
