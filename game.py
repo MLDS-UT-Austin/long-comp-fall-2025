@@ -1,5 +1,6 @@
 import asyncio
 import random
+import hashlib
 from enum import Enum
 from functools import lru_cache
 from itertools import chain
@@ -17,6 +18,26 @@ from visualizations import Visualization
 
 # This file is for internal use to run the game ####################################
 # Use main.py instead ##############################################################
+
+
+def deterministic_choice(seq, seed_value):
+    """Deterministically choose an element from a sequence based on a seed value.
+    
+    Args:
+        seq: A sequence to choose from
+        seed_value: A value to use as a seed for deterministic selection
+        
+    Returns:
+        A deterministically chosen element from the sequence
+    """
+    if not seq:
+        return None
+    # Convert seed_value to a string and hash it to get a consistent integer
+    seed_str = str(seed_value)
+    seed_hash = int(hashlib.md5(seed_str.encode()).hexdigest(), 16)
+    # Use the hash to select an index
+    index = seed_hash % len(seq)
+    return seq[index]
 
 
 # Used to describe how the game ended or if it is ongoing
@@ -222,14 +243,28 @@ class Game:
         conv_list = list(chain(*[round.get_conversation() for round in self.rounds]))
 
         if self.game_state == GameState.NO_ONE_INDICTED:
-            no_one_indicted_msg = random.choice(NO_ONE_INDICTED_RESPONSE)
-            player = random.choice(list(set(range(self.n_players)) - set(self.spies)))
+            # Create a deterministic seed based on game state
+            seed_base = (
+                self.location.value,
+                tuple(self.spies),
+                self.n_players,
+                len(self.rounds),
+                self.game_state.value,
+            )
+            seed_no_one = f"{seed_base}_no_one_indicted"
+            no_one_indicted_msg = deterministic_choice(NO_ONE_INDICTED_RESPONSE, seed_no_one)
+            seed_player = f"{seed_base}_no_one_player"
+            player = deterministic_choice(
+                list(set(range(self.n_players)) - set(self.spies)), seed_player
+            )
             conv_list.append((player, no_one_indicted_msg))
 
             # both spies reveal themselves
-            spy1_reveal_msg = random.choice(SPY_REVEAL)
+            seed_spy1_reveal = f"{seed_base}_spy1_reveal_no_one_{self.spies[0]}"
+            spy1_reveal_msg = deterministic_choice(SPY_REVEAL, seed_spy1_reveal)
             conv_list.append((self.spies[0], spy1_reveal_msg))
-            spy2_reveal_msg = random.choice(SPY_REVEAL)
+            seed_spy2_reveal = f"{seed_base}_spy2_reveal_no_one_{self.spies[1]}"
+            spy2_reveal_msg = deterministic_choice(SPY_REVEAL, seed_spy2_reveal)
             conv_list.append((self.spies[1], spy2_reveal_msg))
 
         df = pd.DataFrame(conv_list, columns=["player", "message"])
@@ -434,20 +469,39 @@ class Round:
         output.append((self.questioner, f"{names[self.answerer]}, {self.question}"))
         output.append((self.answerer, self.answer))
 
+        # Create a deterministic seed based on round state
+        # Use a combination of round-specific data to create a unique seed
+        seed_base = (
+            self.questioner,
+            self.answerer,
+            self.question,
+            self.answer,
+            self.spy_guess.value if self.spy_guess is not None else None,
+            self.indicted,
+            tuple(self.player_votes) if hasattr(self, 'player_votes') else None,
+            game.guessing_spy if game.guessing_spy is not None else None,
+        )
+
         # spy guess
         if self.spy_guess is not None:
             # spy: I am the spy. Was it the {location}?
-            msg = random.choice(SPY_REVEAL_AND_GUESS).format(
+            seed_msg = f"{seed_base}_spy_reveal_{game.guessing_spy}_{self.spy_guess.value}"
+            msg = deterministic_choice(SPY_REVEAL_AND_GUESS, seed_msg).format(
                 location=self.spy_guess.value
             )
             output.append((game.guessing_spy, msg))
-            responder = random.choice(list(set(range(game.n_players)) - set(game.spies)))
+            seed_responder = f"{seed_base}_responder_{game.guessing_spy}"
+            responder = deterministic_choice(
+                list(set(range(game.n_players)) - set(game.spies)), seed_responder
+            )
             if game.game_state in [GameState.SPY1_GUESSED_RIGHT, GameState.SPY2_GUESSED_RIGHT]:
                 # random nonspy: yes that is right
-                msg = random.choice(SPY_GUESS_RIGHT_RESPONSE)
+                seed_response = f"{seed_base}_guess_right_{responder}"
+                msg = deterministic_choice(SPY_GUESS_RIGHT_RESPONSE, seed_response)
             else:
                 # random nonspy: no, it was the {location}
-                msg = random.choice(SPY_GUESS_WRONG_RESPONSE).format(
+                seed_response = f"{seed_base}_guess_wrong_{responder}"
+                msg = deterministic_choice(SPY_GUESS_WRONG_RESPONSE, seed_response).format(
                     location=game.location.value
                 )
             output.append((responder, msg))
@@ -455,21 +509,25 @@ class Round:
         # indictment
         elif self.indicted is not None:
             # one of the accusers: "I think it's player {spy} are you the spy?"
-            accuser = random.choice(
-                [i for i, x in enumerate(self.player_votes) if x == self.indicted]
-            )
-            msg = random.choice(ACCUSATION).format(spy=names[self.indicted])
+            accusers = [i for i, x in enumerate(self.player_votes) if x == self.indicted]
+            seed_accuser = f"{seed_base}_accuser_{self.indicted}"
+            accuser = deterministic_choice(accusers, seed_accuser)
+            seed_accusation = f"{seed_base}_accusation_{accuser}"
+            msg = deterministic_choice(ACCUSATION, seed_accusation).format(spy=names[self.indicted])
             output.append((accuser, msg))
             if game.game_state in [GameState.SPY1_INDICTED, GameState.SPY2_INDICTED]:
                 # spy: I am the spy
-                msg = random.choice(SPY_INDICTED_RESPONSE)
+                seed_indicted = f"{seed_base}_spy_indicted_{self.indicted}"
+                msg = deterministic_choice(SPY_INDICTED_RESPONSE, seed_indicted)
                 output.append((self.indicted, msg))
             else:
                 # indicted: No, I am not the spy
-                msg = random.choice(NON_SPY_INDICTED_RESPONSE)
+                seed_non_spy = f"{seed_base}_non_spy_indicted_{self.indicted}"
+                msg = deterministic_choice(NON_SPY_INDICTED_RESPONSE, seed_non_spy)
                 output.append((self.indicted, msg))
                 # spy: I am the spy
-                msg = random.choice(SPY_REVEAL)
+                seed_spy_reveal = f"{seed_base}_spy_reveal_final_{game.spies[0]}"
+                msg = deterministic_choice(SPY_REVEAL, seed_spy_reveal)
                 output.append((game.spies[0], msg))
 
         return output
