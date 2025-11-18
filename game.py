@@ -477,7 +477,7 @@ class Round:
             self.question,
             self.answer,
             self.spy_guess.value if self.spy_guess is not None else None,
-            self.indicted,
+            game.indicted_spy,
             tuple(self.player_votes) if hasattr(self, 'player_votes') else None,
             game.guessing_spy if game.guessing_spy is not None else None,
         )
