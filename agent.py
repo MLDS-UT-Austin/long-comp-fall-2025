@@ -5,6 +5,7 @@ from typing import final
 from data import Location
 from nlp import LLMRole, NLPProxy
 from util import relative_path_decorator
+from tqdm import tqdm
 
 # This file explains what each method in the Agent class should do ######################
 
@@ -123,7 +124,7 @@ class Agent(ABC):
         """Quick check for return types and edge cases"""
         event_loop = asyncio.get_event_loop()
         nlp = NLPProxy()
-        for _ in range(100):
+        for _ in tqdm(range(100)):
             for loc, n_players in [
                 (Location.BLANTON_MUSEUM, 3),
                 (None, 3),
