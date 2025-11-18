@@ -14,7 +14,7 @@ WHITE_LIST = [
     "github-classroom[bot]",
 ]  # Ignore commits by these authors when filtering repos
 CLASSROOM_ORG = "MLDS-UT-AUSTIN"  # Replace with your org name
-ASSIGNMENT_PREFIX = "longcomp2025-"  # Replace with your assignment prefix
+ASSIGNMENT_PREFIX = "longcompfall2025-"  # Replace with your assignment prefix
 OUTPUT_DIR = "submissions"  # Directory to store cloned repos
 
 # Please put your GITHUB_TOKEN in .env file
