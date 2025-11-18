@@ -2,6 +2,7 @@ einops
 gtts
 matplotlib
 numpy
+opencv-python
 opt-einsum
 pandas
 praat-parselmouth

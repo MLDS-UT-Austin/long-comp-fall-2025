@@ -1,6 +1,7 @@
 games
 .vscode
 credentials/
+recordings/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

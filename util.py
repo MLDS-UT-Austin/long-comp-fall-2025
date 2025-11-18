@@ -44,6 +44,7 @@ def sample_agents(
     agent_names: list[str],
     team_size: int,
     n_games: int,
+    n_spies: int = 1,
     verbose: bool = False,
     max_same_agent: int = 2,
 ) -> list[tuple[list[str], list[int]]]:

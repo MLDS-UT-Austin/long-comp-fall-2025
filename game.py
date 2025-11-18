@@ -484,6 +484,7 @@ class Round:
 
         # spy guess
         if self.spy_guess is not None:
+            spy = random.choice(game.spies)
             # spy: I am the spy. Was it the {location}?
             seed_msg = f"{seed_base}_spy_reveal_{game.guessing_spy}_{self.spy_guess.value}"
             msg = deterministic_choice(SPY_REVEAL_AND_GUESS, seed_msg).format(
@@ -553,4 +554,5 @@ class Round:
             _, audio, _ = voice
             sound = pygame.sndarray.make_sound(audio)
             sound.play()
-            pygame.time.wait(int(sound.get_length() * 1000))
+            # Use wait_and_record to capture frames during audio playback
+            vis.wait_and_record(int(sound.get_length() * 1000))

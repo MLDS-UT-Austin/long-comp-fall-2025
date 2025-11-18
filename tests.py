@@ -13,7 +13,9 @@ from util import *
 # This file is for internal use only to test the code ####################################
 
 
+
 class TestGame(unittest.IsolatedAsyncioTestCase):
+    N_SPIES = 2
 
     @patch("game.AGENT_REGISTRY", {f"Agent{i}": MyAgent for i in range(10)})
     @patch("game.random.choice", lambda x: Location.LBJ_LIBRARY)
@@ -21,7 +23,7 @@ class TestGame(unittest.IsolatedAsyncioTestCase):
     @patch("game.random.randint", lambda x, y: 0)
     async def asyncSetUp(self):
         self.player_names = [f"Agent{i}" for i in range(10)]
-        self.game = Game(NLP(), self.player_names, n_rounds=20)
+        self.game = Game(NLP(), self.player_names, n_rounds=20, n_spies=self.N_SPIES)
 
     async def test_initialization(self):
         self.assertEqual(self.game.n_players, 10)
@@ -41,7 +43,8 @@ class TestGame(unittest.IsolatedAsyncioTestCase):
         await self.game.play_()
         self.assertEqual(self.game.game_state, GameState.SPY1_GUESSED_RIGHT)
         target_scores = pd.Series(index=self.player_names, data=[0.0] * 10)
-        target_scores["Agent0"] = 4.0
+        for i in self.game.spies:
+            target_scores[f"Agent{i}"] = 4.0
         self.assertTrue(self.game.get_scores().equals(target_scores))
 
     async def test_no_one_indicted(self):
@@ -286,7 +289,8 @@ class TestRound(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.round.answer, "Answer0")
         self.assertEqual(self.round.spy_guess, None)
         self.assertEqual(self.round.player_votes, [1, 0, 0])
-        self.assertEqual(self.round.indicted, 0)
+        # assert any spy wins
+        self.assertIn(self.round.indicted, self.game.spies)
 
         p[0].ask_question.assert_awaited_once()
         p[1].ask_question.assert_not_called()
